@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package org.jameshpark.banksy
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
@@ -29,6 +27,7 @@ object Extractor {
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     private fun parseTransactions(rows: Flow<Map<String, String>>): Flow<Transaction> = rows.flatMapMerge { row ->
         flow {
             val mapper = headersToMapper[row.keys]
