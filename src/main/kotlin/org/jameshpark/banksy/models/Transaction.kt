@@ -3,6 +3,7 @@ package org.jameshpark.org.jameshpark.banksy.models
 import org.jameshpark.banksy.Mapper
 import org.jameshpark.banksy.models.Category
 import org.jameshpark.banksy.models.TransactionType
+import org.jameshpark.banksy.models.getCategory
 import java.math.BigDecimal
 import java.time.LocalDate
 
@@ -23,7 +24,7 @@ fun Map<String, String>.toTransaction(mapper: Mapper): Transaction {
         date,
         description,
         amount,
-        Category.CAR, // TODO: get from categories map
+        getCategory(description),
         mapper.determineTransactionType(amount)
     )
 }

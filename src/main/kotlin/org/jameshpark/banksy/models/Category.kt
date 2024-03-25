@@ -29,6 +29,10 @@ enum class Category {
     OTHER,
 }
 
+fun getCategory(description: String) = categories.filterKeys { k ->
+    k in description
+}.values.firstOrNull() ?: Category.UNCATEGORIZED
+
 val categories = mapOf(
     "AIRBNB" to Category.TRAVEL,
     "ALAMO RENT" to Category.TRAVEL,
