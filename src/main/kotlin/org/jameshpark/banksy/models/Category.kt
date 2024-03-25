@@ -29,11 +29,11 @@ enum class Category {
     OTHER,
 }
 
-fun getCategory(description: String) = categories.filterKeys { k ->
-    k in description
+fun getCategory(description: String) = descriptionToCategory.filterKeys { k ->
+    description.contains(k, ignoreCase = true)
 }.values.firstOrNull() ?: Category.UNCATEGORIZED
 
-val categories = mapOf(
+val descriptionToCategory = mapOf(
     "AIRBNB" to Category.TRAVEL,
     "ALAMO RENT" to Category.TRAVEL,
     "ALASKA AIRLINES" to Category.TRAVEL,

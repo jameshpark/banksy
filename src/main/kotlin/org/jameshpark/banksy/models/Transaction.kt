@@ -18,7 +18,7 @@ data class Transaction(
 fun Map<String, String>.toTransaction(mapper: Mapper): Transaction {
     val date = LocalDate.parse(get(mapper.dateColumn)!!, mapper.dateTimeFormatter)
     val description = get(mapper.descriptionColumn)!!
-    val amount = BigDecimal(get(mapper.amountColumn))
+    val amount = BigDecimal(get(mapper.amountColumn)).abs()
 
     return Transaction(
         date,
