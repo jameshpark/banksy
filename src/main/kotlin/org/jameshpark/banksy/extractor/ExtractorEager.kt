@@ -1,6 +1,7 @@
-package org.jameshpark.banksy
+package org.jameshpark.banksy.extractor
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import org.jameshpark.banksy.transformer.headersToMapper
 import org.jameshpark.banksy.models.Transaction
 import org.jameshpark.banksy.models.toTransaction
 import java.io.File

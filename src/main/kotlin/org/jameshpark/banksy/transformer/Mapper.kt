@@ -1,4 +1,4 @@
-package org.jameshpark.banksy
+package org.jameshpark.banksy.transformer
 
 import org.jameshpark.banksy.models.TransactionType
 import java.math.BigDecimal

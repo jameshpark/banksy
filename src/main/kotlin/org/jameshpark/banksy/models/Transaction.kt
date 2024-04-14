@@ -1,6 +1,6 @@
 package org.jameshpark.banksy.models
 
-import org.jameshpark.banksy.Mapper
+import org.jameshpark.banksy.transformer.Mapper
 import java.math.BigDecimal
 import java.security.MessageDigest
 import java.time.LocalDate

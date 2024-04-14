@@ -1,4 +1,4 @@
-package org.jameshpark.banksy
+package org.jameshpark.banksy.transformer
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -6,13 +6,15 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapMerge
 import kotlinx.coroutines.flow.flow
 import org.jameshpark.banksy.models.Category
-import org.jameshpark.banksy.models.TransactionType
 import org.jameshpark.banksy.models.Transaction
+import org.jameshpark.banksy.models.TransactionType
 import org.jameshpark.banksy.models.toTransaction
 import java.math.BigDecimal
 
-object Transformer {
-    fun transform(rows: Flow<Map<String, String>>): Flow<Transaction> = parseTransactions(rows)
+class DefaultTransformer : Transformer {
+    override suspend fun transform(rows: Flow<Map<String, String>>): Flow<Transaction> {
+        return parseTransactions(rows)
+    }
 
     suspend fun spendingByCategory(transactions: Flow<Transaction>): Map<Category, BigDecimal> {
         val spendingByCategory = mutableMapOf<Category, BigDecimal>()
