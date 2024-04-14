@@ -1,20 +1,15 @@
-package org.jameshpark.org.jameshpark.banksy
+package org.jameshpark.banksy
 
 import kotlinx.coroutines.runBlocking
-import org.jameshpark.banksy.Extractor
-import org.jameshpark.banksy.ExtractorEager
-import org.jameshpark.banksy.Transformer
-import org.jameshpark.banksy.models.Category
-import org.jameshpark.banksy.models.TransactionType
-import org.jameshpark.banksy.models.categoryFrom
-import java.io.File
-import java.math.BigDecimal
 
 fun main() = runBlocking {
-    val transactions = Extractor.extractFromCsv("transactions")
-    val spendingByCategory = Transformer.spendingByCategory(transactions)
+    val rows = Extractor.extractTransactionData("transactions")
+    val transactions = Transformer.transform(rows)
+    Loader.loadTransactions(transactions)
 
-    spendingByCategory.forEach { println(it) }
+//    val spendingByCategory = Transformer.spendingByCategory(transactions)
+
+//    spendingByCategory.forEach { println(it) }
 
 //    val transactions = ExtractorEager.extractFromCsv("transactions")
 //    transactions.map { it.description }.toSet().forEach { println(it) }

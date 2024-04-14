@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package org.jameshpark.banksy.models
 
 import kotlinx.coroutines.*

@@ -1,13 +1,13 @@
 package org.jameshpark.banksy
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
-import org.jameshpark.org.jameshpark.banksy.models.Transaction
-import org.jameshpark.org.jameshpark.banksy.models.toTransaction
+import org.jameshpark.banksy.models.Transaction
+import org.jameshpark.banksy.models.toTransaction
 import java.io.File
 
 object ExtractorEager {
 
-    fun extractFromCsv(directoryName: String): List<Transaction> {
+    suspend fun extractFromCsv(directoryName: String): List<Transaction> {
         val rows = extractRows(directoryName)
         return parseTransactions(rows)
     }
@@ -25,7 +25,7 @@ object ExtractorEager {
         }
     }
 
-    private fun parseTransactions(rows: List<Map<String, String>>): List<Transaction> = rows.map { row ->
+    private suspend fun parseTransactions(rows: List<Map<String, String>>): List<Transaction> = rows.map { row ->
         val mapper = headersToMapper[row.keys]
         if (mapper != null) {
             row.toTransaction(mapper)

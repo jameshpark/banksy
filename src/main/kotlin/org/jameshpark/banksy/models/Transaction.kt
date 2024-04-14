@@ -1,7 +1,6 @@
-package org.jameshpark.org.jameshpark.banksy.models
+package org.jameshpark.banksy.models
 
 import org.jameshpark.banksy.Mapper
-import org.jameshpark.banksy.models.*
 import java.math.BigDecimal
 import java.security.MessageDigest
 import java.time.LocalDate
@@ -13,7 +12,16 @@ data class Transaction(
     val category: Category,
     val type: TransactionType,
     val originHash: String
-)
+) {
+    fun toRow(): List<String> = listOf(
+        date.toString(),
+        description,
+        amount.toString(),
+        category.name,
+        type.name,
+        originHash
+    )
+}
 
 suspend fun Map<String, String>.toTransaction(mapper: Mapper): Transaction {
     val date = LocalDate.parse(get(mapper.dateColumn)!!, mapper.dateTimeFormatter)
