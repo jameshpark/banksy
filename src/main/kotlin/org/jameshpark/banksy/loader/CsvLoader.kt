@@ -22,7 +22,7 @@ class CsvLoader(private val writer: CsvWriter = csvWriter()) : Loader {
         }
         writer.openAsync(database, append = true) {
             transactions.collect {
-                writeRow(it.toRow())
+                writeRow(it.toCsvRow())
             }
         }
     }

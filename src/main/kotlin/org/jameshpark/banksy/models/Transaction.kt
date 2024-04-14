@@ -13,10 +13,19 @@ data class Transaction(
     val type: TransactionType,
     val originHash: String
 ) {
-    fun toRow(): List<String> = listOf(
+    fun toCsvRow(): List<String> = listOf(
         date.toString(),
         description,
         amount.toString(),
+        category.name,
+        type.name,
+        originHash
+    )
+
+    fun toDbRow(): List<Any?> = listOf(
+        date,
+        description,
+        amount,
         category.name,
         type.name,
         originHash
