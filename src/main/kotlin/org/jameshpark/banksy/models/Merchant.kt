@@ -12,33 +12,6 @@ data class Merchant(
     fun existsIn(description: String): Boolean = compiledRegex.containsMatchIn(description)
 }
 
-enum class Category {
-    UNCATEGORIZED,
-    MORTGAGE,
-    HOME_MAINTENANCE,
-    UTILITIES,
-    CAR_LOAN,
-    GAS,
-    CAR_MAINTENANCE,
-    INSURANCE,
-    GROCERIES,
-    RESTAURANTS,
-    COFFEE,
-    ENTERTAINMENT,
-    CLOTHING,
-    HOBBIES,
-    ESSENTIALS,
-    PRODUCTIVITY,
-    TRANSPORTATION,
-    VACATION,
-    GIFT_DONATION,
-    TRANSFER,
-    PET,
-    BANK_FEE,
-    MEDICAL,
-    INCOME
-}
-
 val merchants = listOf(
     Merchant(name = "Airbnb", category = Category.VACATION, regex = """airbnb"""),
     Merchant(name = "Alamo Rental", category = Category.VACATION, regex = """alamo\s?rent"""),

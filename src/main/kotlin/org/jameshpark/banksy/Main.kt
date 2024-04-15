@@ -12,8 +12,9 @@ fun main() = runBlocking {
 
     val rows = csvExtractor.extractTransactionData("transactions")
     val transactions = transformer.transform(rows)
-//    CsvLoader().saveTransactions(transactions)
 
     loader.initializeDatabase()
     loader.saveTransactions(transactions)
+
+    loader.exportToCsv("database.csv")
 }

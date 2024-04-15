@@ -1,0 +1,28 @@
+package org.jameshpark.banksy.models
+
+enum class Category {
+    UNCATEGORIZED,
+    MORTGAGE,
+    HOME_MAINTENANCE,
+    UTILITIES,
+    CAR_LOAN,
+    GAS,
+    CAR_MAINTENANCE,
+    INSURANCE,
+    GROCERIES,
+    RESTAURANTS,
+    COFFEE,
+    ENTERTAINMENT,
+    CLOTHING,
+    HOBBIES,
+    ESSENTIALS,
+    PRODUCTIVITY,
+    TRANSPORTATION,
+    VACATION,
+    GIFT_DONATION,
+    TRANSFER,
+    PET,
+    BANK_FEE,
+    MEDICAL,
+    INCOME
+}

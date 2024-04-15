@@ -6,4 +6,6 @@ import org.jameshpark.banksy.models.Transaction
 interface Loader {
 
     suspend fun saveTransactions(transactions: Flow<Transaction>)
+
+    suspend fun exportToCsv(filePath: String)
 }

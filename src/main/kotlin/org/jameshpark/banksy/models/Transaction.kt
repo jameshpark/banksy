@@ -35,13 +35,13 @@ data class Transaction(
 suspend fun Map<String, String>.toTransaction(mapper: Mapper): Transaction {
     val date = LocalDate.parse(get(mapper.dateColumn)!!, mapper.dateTimeFormatter)
     val description = get(mapper.descriptionColumn)!!
-    val amount = BigDecimal(get(mapper.amountColumn)).abs()
+    val amount = BigDecimal(get(mapper.amountColumn))
     val originHash = hash()
 
     return Transaction(
         date,
         description,
-        amount,
+        amount.abs(),
         categoryFrom(description),
         mapper.determineTransactionType(amount),
         originHash

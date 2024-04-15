@@ -26,4 +26,8 @@ class CsvLoader(private val writer: CsvWriter = csvWriter()) : Loader {
             }
         }
     }
+
+    override suspend fun exportToCsv(filePath: String) {
+        TODO("Not yet implemented")
+    }
 }
