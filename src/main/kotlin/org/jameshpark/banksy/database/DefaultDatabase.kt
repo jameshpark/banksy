@@ -6,10 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
-import java.sql.Connection
-import java.sql.PreparedStatement
-import java.sql.ResultSet
-import java.sql.Types
+import java.sql.*
+import java.time.LocalDate
 import javax.lang.model.type.NullType
 
 class DefaultDatabase(private val conn: Connection) : Database {
@@ -23,7 +21,7 @@ class DefaultDatabase(private val conn: Connection) : Database {
         }
     }
 
-    override suspend fun  executeBatch (sql: String, batchParams: List<List<Any?>>): List<Int> {
+    override suspend fun executeBatch(sql: String, batchParams: List<List<Any?>>): List<Int> {
         val ps = prepareBatchStatement(sql, batchParams)
         val updateCounts = ps.use {
             withContext(Dispatchers.IO) {
@@ -35,13 +33,17 @@ class DefaultDatabase(private val conn: Connection) : Database {
         return updateCounts.toList()
     }
 
-    override suspend fun <T> query(sql: String, params: List<Any?>, transform: ResultSet.() -> T): Flow<T> {
-        return prepareStatement(sql, params).use {
-            flow {
-                val rs = it.executeQuery()
-                while (rs.next()) {
-                    emit(rs.transform())
-                }
+    override suspend fun <T> query(sql: String, params: List<Any?>, transform: ResultSet.() -> T): Flow<T> = flow {
+        prepareStatement(sql, params).use { preparedStatement ->
+            val rs = withContext(Dispatchers.IO) {
+                async {
+                    preparedStatement.executeQuery()
+                }.await()
+            }
+
+            while (rs.next()) {
+                val result = rs.transform()
+                emit(result)
             }
         }
     }
@@ -60,6 +62,7 @@ class DefaultDatabase(private val conn: Connection) : Database {
                 is Double -> setDouble(sqlIndex, param)
                 is BigDecimal -> setBigDecimal(sqlIndex, param)
                 is Boolean -> setBoolean(sqlIndex, param)
+                is LocalDate -> setDate(sqlIndex, Date.valueOf(param))
                 is NullType -> setNull(sqlIndex, Types.NULL)
                 else -> throw IllegalArgumentException("Unsupported parameter type for param '$param'")
             }

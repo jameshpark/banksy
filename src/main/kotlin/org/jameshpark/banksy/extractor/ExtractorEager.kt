@@ -1,6 +1,7 @@
 package org.jameshpark.banksy.extractor
 
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
+import io.github.oshai.kotlinlogging.KotlinLogging
 import org.jameshpark.banksy.transformer.headersToMapper
 import org.jameshpark.banksy.models.Transaction
 import org.jameshpark.banksy.models.toTransaction
@@ -31,8 +32,10 @@ object ExtractorEager {
         if (mapper != null) {
             row.toTransaction(mapper)
         } else {
-            println("No mapper for headers '${row.keys}', skipping row '${row.values}'")
+            logger.info { "No mapper for headers '${row.keys}', skipping row '${row.values}'" }
             null
         }
     }.filterNotNull().sortedBy { it.description }
+
+    private val logger = KotlinLogging.logger { }
 }
