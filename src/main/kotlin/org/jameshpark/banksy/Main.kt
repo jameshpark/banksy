@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.jameshpark.banksy.extractor.CsvExtractor
 import org.jameshpark.banksy.loader.DbLoader
 import org.jameshpark.banksy.transformer.DefaultTransformer
+import java.time.Instant
 
 fun main() = runBlocking {
     val csvExtractor = CsvExtractor()
@@ -16,5 +17,6 @@ fun main() = runBlocking {
     loader.initializeDatabase()
     loader.saveTransactions(transactions)
 
-    loader.exportToCsv("database.csv")
+    val fileName = "export_${Instant.now().epochSecond}.csv"
+    loader.exportToCsv("exports/$fileName")
 }

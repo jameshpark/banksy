@@ -23,13 +23,11 @@ import java.util.concurrent.atomic.AtomicInteger
 
 class DbLoader(private val db: Database, private val writer: CsvWriter = csvWriter()) : Loader {
     override suspend fun saveTransactions(transactions: Flow<Transaction>) {
-        println("Entered saveTransactions")
         val sql = """
             INSERT OR IGNORE INTO transactions (date, description, amount, category, type, originHash)
             VALUES (?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
-        println("val sql")
         // filter transactions to those newer than the current bookmark
         val bookmark = getCurrentBookmark() ?: LocalDate.EPOCH
         logger.info { "Current bookmark: $bookmark" }
@@ -37,12 +35,10 @@ class DbLoader(private val db: Database, private val writer: CsvWriter = csvWrit
         // keep track of the latest transaction date seen
         var latestTransactionDate = LocalDate.EPOCH
 
-        println("before filtering transactions")
         val counter = AtomicInteger(0)
         transactions.filter {
             it.date.isAfter(bookmark)
         }.chunked(500).collect { chunk ->
-            println("processing chunk")
             // save the latest transaction date seen
             chunk.maxByOrNull { it.date }?.let {
                 if (it.date.isAfter(latestTransactionDate)) {
@@ -50,7 +46,6 @@ class DbLoader(private val db: Database, private val writer: CsvWriter = csvWrit
                 }
             }
 
-            println("before saving chunk to db")
             // save to db
             val batchParams = chunk.map { it.toDbRow() }
             db.executeBatch(sql, batchParams)
@@ -65,24 +60,22 @@ class DbLoader(private val db: Database, private val writer: CsvWriter = csvWrit
         }
     }
 
-    override suspend fun exportToCsv(filePath: String) {
+    override suspend fun exportToCsv(filePath: String, includeHeader: Boolean) {
         logger.info { "Exporting to $filePath" }
         val output = File(filePath)
 
-        // check if database.csv exists, if not create it
+        // create new file
         withContext(Dispatchers.IO) {
-            if (output.exists()) {
-                launch {
-                    output.delete()
-                }.join()
-            } else {
-                launch {
-                    output.createNewFile()
+            launch {
+                output.createNewFile()
+                if (includeHeader) {
                     output.writeText("date,description,amount,category,type,originHash\n")
-                }.join()
-            }
+                }
+            }.join()
         }
 
+        val exportBookmark = getCurrentExportBookmark() ?: LocalDate.EPOCH
+        val params = listOf(exportBookmark)
         val sql = """
             SELECT date
                  , description
@@ -91,10 +84,11 @@ class DbLoader(private val db: Database, private val writer: CsvWriter = csvWrit
                  , type
                  , originHash
             FROM transactions
+            WHERE date > ?
             ORDER BY date DESC
         """.trimIndent()
 
-        val transactions = db.query(sql) {
+        val transactions = db.query(sql, params) {
             Transaction(
                 date = getDate("date").toLocalDate(),
                 description = getString("description"),
@@ -105,17 +99,28 @@ class DbLoader(private val db: Database, private val writer: CsvWriter = csvWrit
             )
         }
 
+        val counter = AtomicInteger(0)
+        var nextExportBookmark = LocalDate.EPOCH
         writer.openAsync(output, append = true) {
             transactions.collect {
+                if (counter.get() == 0) {
+                    nextExportBookmark = it.date
+                }
                 writeRow(it.toCsvRow())
+                if (counter.incrementAndGet() % 10 == 0) {
+                    logger.info { "Exported ${counter.get()} transactions to $filePath" }
+                }
             }
         }
-        logger.info { "Exported transactions to $filePath" }
+        logger.info { "Exported ${counter.get()} transactions to $filePath" }
+
+        saveExportBookmark(nextExportBookmark)
     }
 
     suspend fun initializeDatabase() {
         createTransactionsTable()
         createBookmarksTable()
+        createExportBookmarksTable()
         logger.info { "Initialized database" }
     }
 
@@ -128,6 +133,19 @@ class DbLoader(private val db: Database, private val writer: CsvWriter = csvWrit
 
     private suspend fun saveBookmark(bookmark: LocalDate) {
         val sql = "INSERT INTO bookmarks (run_timestamp, bookmark) VALUES (?, ?)"
+        val params = listOf(Instant.now().toEpochMilli(), bookmark)
+        db.execute(sql, params)
+    }
+
+    private suspend fun getCurrentExportBookmark(): LocalDate? {
+        val sql = "SELECT bookmark FROM export_bookmarks ORDER BY bookmark DESC LIMIT 1"
+        return db.query(sql) {
+            this.getDate("bookmark")
+        }.firstOrNull()?.toLocalDate()
+    }
+
+    private suspend fun saveExportBookmark(bookmark: LocalDate) {
+        val sql = "INSERT INTO export_bookmarks (run_timestamp, bookmark) VALUES (?, ?)"
         val params = listOf(Instant.now().toEpochMilli(), bookmark)
         db.execute(sql, params)
     }
@@ -158,6 +176,17 @@ class DbLoader(private val db: Database, private val writer: CsvWriter = csvWrit
         db.execute(sql)
     }
 
+    private suspend fun createExportBookmarksTable() {
+        val sql = """
+            CREATE TABLE IF NOT EXISTS export_bookmarks (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                run_timestamp INTEGER NOT NULL,
+                bookmark INTEGER NOT NULL
+            );
+        """.trimIndent()
+        db.execute(sql)
+    }
+
     companion object {
         private val logger = KotlinLogging.logger { }
 
@@ -173,7 +202,6 @@ class DbLoader(private val db: Database, private val writer: CsvWriter = csvWrit
 fun <T> Flow<T>.chunked(size: Int): Flow<List<T>> = flow {
     val chunk = mutableListOf<T>()
     collect {
-        println("collecting into chunk")
         chunk.add(it)
         if (chunk.size >= size) {
             emit(chunk.toList())
