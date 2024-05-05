@@ -4,10 +4,7 @@ import com.github.doyaaaaaken.kotlincsv.client.CsvWriter
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jameshpark.banksy.database.Database
@@ -24,8 +21,8 @@ import java.util.concurrent.atomic.AtomicInteger
 class DbLoader(private val db: Database, private val writer: CsvWriter = csvWriter()) : Loader {
     override suspend fun saveTransactions(transactions: Flow<Transaction>) {
         val sql = """
-            INSERT OR IGNORE INTO transactions (date, description, amount, category, type, originHash)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT OR IGNORE INTO transactions (date, description, amount, category, critical, type, originHash)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
         // filter transactions to those newer than the current bookmark
@@ -69,7 +66,7 @@ class DbLoader(private val db: Database, private val writer: CsvWriter = csvWrit
             launch {
                 output.createNewFile()
                 if (includeHeader) {
-                    output.writeText("date,description,amount,category,type,originHash\n")
+                    output.writeText("date,description,amount,category,critical,type,originHash\n")
                 }
             }.join()
         }
@@ -81,6 +78,7 @@ class DbLoader(private val db: Database, private val writer: CsvWriter = csvWrit
                  , description
                  , amount
                  , category
+                 , critical
                  , type
                  , originHash
             FROM transactions
@@ -158,6 +156,7 @@ class DbLoader(private val db: Database, private val writer: CsvWriter = csvWrit
                 description TEXT NOT NULL,
                 amount REAL NOT NULL,
                 category TEXT NOT NULL,
+                critical INTEGER NOT NULL,
                 type TEXT NOT NULL,
                 originHash TEXT NOT NULL
             );

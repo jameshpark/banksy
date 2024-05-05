@@ -18,6 +18,7 @@ data class Transaction(
         description,
         amount.toString(),
         category.name,
+        category.critical.toString(),
         type.name,
         originHash
     )
@@ -27,6 +28,7 @@ data class Transaction(
         description,
         amount,
         category.name,
+        category.critical,
         type.name,
         originHash
     )

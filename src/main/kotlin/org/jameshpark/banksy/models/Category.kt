@@ -1,13 +1,11 @@
 package org.jameshpark.banksy.models
 
-enum class Category {
+enum class Category(val critical: Boolean = false) {
     UNCATEGORIZED,
-    MORTGAGE,
-    HOME_MAINTENANCE,
-    UTILITIES,
-    CAR_LOAN,
+    MORTGAGE(critical = true),
+    UTILITIES(critical = true),
+    CAR_PAYMENT(critical = true),
     GAS,
-    CAR_MAINTENANCE,
     INSURANCE,
     GROCERIES,
     RESTAURANTS,
@@ -24,5 +22,15 @@ enum class Category {
     PET,
     BANK_FEE,
     MEDICAL,
-    INCOME
+    INCOME,
+    PHONE(critical = true),
+    DENTAL(critical = true),
+    CAR_UPKEEP,
+    CAR_SERVICE_PARTS(critical = true),
+    HOME_IMPROVEMENT,
+    HOME_UPKEEP,
+    HOME_REPAIR(critical = true),
+    VISION(critical = true),
+    CAR_USE_EXPENSE,
+    STREAMING
 }
