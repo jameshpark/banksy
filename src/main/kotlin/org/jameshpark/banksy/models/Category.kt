@@ -21,7 +21,7 @@ enum class Category(val critical: Boolean = false) {
     TRANSFER,
     PET,
     BANK_FEE,
-    MEDICAL,
+    MEDICAL(critical = true),
     INCOME,
     PHONE(critical = true),
     DENTAL(critical = true),
