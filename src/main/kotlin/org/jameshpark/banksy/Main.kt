@@ -7,11 +7,11 @@ import org.jameshpark.banksy.transformer.DefaultTransformer
 import java.time.Instant
 
 fun main() = runBlocking {
-    val csvExtractor = CsvExtractor()
+    val extractor = CsvExtractor()
     val transformer = DefaultTransformer()
     val loader = DbLoader.fromUrl("jdbc:sqlite:database.db")
 
-    val rows = csvExtractor.extractTransactionData("transactions")
+    val rows = extractor.extractTransactionData("transactions")
     val transactions = transformer.transform(rows)
 
     loader.initializeDatabase()
