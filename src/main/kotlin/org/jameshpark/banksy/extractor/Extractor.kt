@@ -1,7 +1,8 @@
 package org.jameshpark.banksy.extractor
 
 import kotlinx.coroutines.flow.Flow
+import org.jameshpark.banksy.models.Feed
 
-interface Extractor {
-    suspend fun extractTransactionData(sourcePath: String): Flow<Map<String, String>>
+interface Extractor<T : Feed> {
+    suspend fun extract(feed: T): Flow<Map<String, String>>
 }
