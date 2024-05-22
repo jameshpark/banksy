@@ -30,7 +30,7 @@ fun main(): Unit = runBlocking {
         csvFeeds.map { feed ->
             launch {
                 val rows = extractor.extract(feed)
-                val transactions = transformer.transform(rows)
+                val transactions = transformer.transform(rows, feed.file.name)
                 loader.saveTransactions(feed, transactions)
                 val fileName = "export_${feed.getBookmarkName()}_${Instant.now().epochSecond}.csv"
                 loader.exportToCsv(feed, "exports/$fileName")

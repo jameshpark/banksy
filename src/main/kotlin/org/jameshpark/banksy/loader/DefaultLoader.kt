@@ -4,19 +4,23 @@ import com.github.doyaaaaaken.kotlincsv.client.CsvWriter
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jameshpark.banksy.database.Dao
 import org.jameshpark.banksy.models.Feed
 import org.jameshpark.banksy.models.Transaction
+import org.jameshpark.banksy.utils.chunked
 import java.io.File
 import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
 
 class DefaultLoader(private val dao: Dao, private val writer: CsvWriter = csvWriter()) : Loader {
     override suspend fun saveTransactions(feed: Feed, transactions: Flow<Transaction>) {
-        dao.saveTransactions(transactions)
+        transactions.chunked(500).collect { chunk ->
+            dao.saveTransactions(chunk)
+            logger.info { "Saved ${chunk.size} transactions" }
+        }
     }
 
     override suspend fun exportToCsv(feed: Feed, filePath: String, includeHeader: Boolean) {

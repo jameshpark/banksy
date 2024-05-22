@@ -75,20 +75,14 @@ class Dao(private val db: Database) {
         db.execute(sql, params)
     }
 
-    suspend fun saveTransactions(transactions: Flow<Transaction>) {
+    suspend fun saveTransactions(transactions: List<Transaction>) {
         val sql = """
             INSERT OR IGNORE INTO transactions (date, description, amount, category, critical, type, originHash)
             VALUES (?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
-        val counter = AtomicInteger(0)
-        transactions.chunked(500).collect { chunk ->
-            // save to db
-            val batchParams = chunk.map { it.toDbRow() }
-            db.executeBatch(sql, batchParams)
-
-            logger.info { "Saved ${counter.addAndGet(chunk.size)} transactions" }
-        }
+        val batchParams = transactions.map { it.toDbRow() }
+        db.executeBatch(sql, batchParams)
     }
 
     suspend fun initializeDatabase() {
