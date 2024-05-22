@@ -76,5 +76,3 @@ class DefaultDatabase(private val conn: Connection) : Database {
         }
     }
 }
-
-
