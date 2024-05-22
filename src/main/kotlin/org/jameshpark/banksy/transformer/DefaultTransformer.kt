@@ -3,6 +3,7 @@ package org.jameshpark.banksy.transformer
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.*
+import org.jameshpark.banksy.models.Category
 import org.jameshpark.banksy.models.Transaction
 import org.jameshpark.banksy.models.toTransaction
 import java.util.concurrent.atomic.AtomicInteger
@@ -18,7 +19,13 @@ class DefaultTransformer : Transformer {
                 val mapper = headersToMapper[row.keys]
 
                 if (mapper != null) {
-                    emit(row.toTransaction(mapper))
+                    val transaction = row.toTransaction(mapper)
+                    if (transaction.category == Category.UNCATEGORIZED) {
+                       logger.info { "UNCATEGORIZED transaction for merchant '${transaction.description}'" }
+                    }
+
+                    emit(transaction)
+
                     if (counter.incrementAndGet() % 100 == 0) {
                         logger.info { "Parsed ${counter.get()} transactions ${sourceName?.let { "from $it" } ?: ""}" }
                     }
