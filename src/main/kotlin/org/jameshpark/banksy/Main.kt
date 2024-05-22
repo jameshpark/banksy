@@ -11,7 +11,7 @@ import org.jameshpark.banksy.transformer.DefaultTransformer
 import java.io.File
 import java.time.Instant
 
-const val SOURCE_DIRECTORY = "transaction"
+const val SOURCE_DIRECTORY = "transactions"
 
 fun main(): Unit = runBlocking {
     val dao = Dao.fromUrl("jdbc:sqlite:database.db")
