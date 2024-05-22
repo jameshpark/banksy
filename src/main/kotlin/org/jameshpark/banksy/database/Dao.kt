@@ -7,14 +7,12 @@ import kotlinx.coroutines.flow.toList
 import org.jameshpark.banksy.models.Category
 import org.jameshpark.banksy.models.Transaction
 import org.jameshpark.banksy.models.TransactionType
-import org.jameshpark.banksy.utils.chunked
 import java.sql.DriverManager
 import java.time.Instant
 import java.time.LocalDate
-import java.util.concurrent.atomic.AtomicInteger
 
 class Dao(private val db: Database) {
-    suspend fun getTransactionsSinceDate(date: LocalDate): Flow<Transaction> {
+    suspend fun getTransactionsNewerThanId(id: Int): Flow<Transaction> {
         val sql = """
             SELECT date
                  , description
@@ -24,11 +22,11 @@ class Dao(private val db: Database) {
                  , type
                  , originHash
             FROM transactions
-            WHERE date > ?
+            WHERE id > ?
             ORDER BY date DESC
         """.trimIndent()
 
-        val params = listOf(date)
+        val params = listOf(id)
 
         return db.query(sql, params) {
             Transaction(
@@ -51,22 +49,6 @@ class Dao(private val db: Database) {
         ) {
             this.getDate("bookmark")
         }.firstOrNull()?.toLocalDate()
-    }
-
-    suspend fun getPreviousBookmarkByName(name: String): LocalDate? {
-        val sql = "SELECT bookmark FROM bookmarks WHERE name = ? ORDER BY bookmark DESC LIMIT 2"
-        val results = db.query(
-            sql,
-            listOf(name)
-        ) {
-            this.getDate("bookmark")
-        }.toList()
-
-        return if (results.size != 2) {
-            null
-        } else {
-            results.last().toLocalDate()
-        }
     }
 
     suspend fun saveBookmark(name: String, bookmark: LocalDate) {
@@ -117,6 +99,17 @@ class Dao(private val db: Database) {
             );
         """.trimIndent()
         db.execute(sql)
+    }
+
+    suspend fun getLatestTransactionId(): Int {
+        val sql = """
+            SELECT MAX(id) AS id
+            FROM transactions
+        """.trimIndent()
+
+        return db.query(sql) {
+            getInt("id")
+        }.firstOrNull() ?: 0
     }
 
     companion object {

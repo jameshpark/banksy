@@ -12,7 +12,6 @@ import org.jameshpark.banksy.models.Feed
 import org.jameshpark.banksy.models.Transaction
 import org.jameshpark.banksy.utils.chunked
 import java.io.File
-import java.time.LocalDate
 import java.util.concurrent.atomic.AtomicInteger
 
 class DefaultLoader(private val dao: Dao, private val writer: CsvWriter = csvWriter()) : Loader {
@@ -23,7 +22,7 @@ class DefaultLoader(private val dao: Dao, private val writer: CsvWriter = csvWri
         }
     }
 
-    override suspend fun exportToCsv(feed: Feed, filePath: String, includeHeader: Boolean) {
+    override suspend fun exportToCsv(filePath: String, sinceId: Int, includeHeader: Boolean) {
         logger.info { "Exporting to $filePath" }
         val output = File(filePath)
 
@@ -37,8 +36,7 @@ class DefaultLoader(private val dao: Dao, private val writer: CsvWriter = csvWri
             }
         }
 
-        val exportBookmark = dao.getPreviousBookmarkByName(feed.getBookmarkName()) ?: LocalDate.EPOCH
-        val transactions = dao.getTransactionsSinceDate(exportBookmark)
+        val transactions = dao.getTransactionsNewerThanId(sinceId)
 
         val counter = AtomicInteger(0)
         fileCreation.join()

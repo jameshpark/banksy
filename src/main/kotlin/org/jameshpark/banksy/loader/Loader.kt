@@ -8,5 +8,5 @@ interface Loader {
 
     suspend fun saveTransactions(feed: Feed, transactions: Flow<Transaction>)
 
-    suspend fun exportToCsv(feed: Feed, filePath: String, includeHeader: Boolean = false)
+    suspend fun exportToCsv(filePath: String, sinceId: Int, includeHeader: Boolean = false)
 }

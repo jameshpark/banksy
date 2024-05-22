@@ -26,15 +26,17 @@ fun main(): Unit = runBlocking {
         emptyList()
     }
 
+    val transactionIdBeforeLoad = dao.getLatestTransactionId()
     coroutineScope {
         csvFeeds.map { feed ->
             launch {
                 val rows = extractor.extract(feed)
                 val transactions = transformer.transform(rows, feed.file.name)
                 loader.saveTransactions(feed, transactions)
-                val fileName = "export_${feed.getBookmarkName()}_${Instant.now().epochSecond}.csv"
-                loader.exportToCsv(feed, "exports/$fileName")
             }
         }
     }
+
+    val fileName = "export_${Instant.now().epochSecond}.csv"
+    loader.exportToCsv("exports/$fileName", transactionIdBeforeLoad)
 }
