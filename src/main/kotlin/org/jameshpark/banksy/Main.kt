@@ -4,9 +4,11 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.jameshpark.banksy.database.Dao
+import org.jameshpark.banksy.exporter.CsvExporter
 import org.jameshpark.banksy.extractor.CsvExtractor
 import org.jameshpark.banksy.loader.DefaultLoader
 import org.jameshpark.banksy.models.CsvFeed
+import org.jameshpark.banksy.models.CsvSink
 import org.jameshpark.banksy.transformer.DefaultTransformer
 import java.io.File
 import java.time.Instant
@@ -18,6 +20,7 @@ fun main(): Unit = runBlocking {
     val extractor = CsvExtractor(dao)
     val transformer = DefaultTransformer()
     val loader = DefaultLoader(dao)
+    val csvExporter = CsvExporter(dao)
 
     val directory = File(SOURCE_DIRECTORY)
     val csvFeeds = if (directory.exists() && directory.isDirectory) {
@@ -27,6 +30,7 @@ fun main(): Unit = runBlocking {
     }
 
     val transactionIdBeforeLoad = dao.getLatestTransactionId()
+
     coroutineScope {
         csvFeeds.map { feed ->
             launch {
@@ -37,6 +41,6 @@ fun main(): Unit = runBlocking {
         }
     }
 
-    val fileName = "export_${Instant.now().epochSecond}.csv"
-    loader.exportToCsv("exports/$fileName", transactionIdBeforeLoad)
+    val filePath = "exports/export_${Instant.now().epochSecond}.csv"
+    csvExporter.export(CsvSink(filePath), transactionIdBeforeLoad)
 }

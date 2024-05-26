@@ -3,16 +3,11 @@ package org.jameshpark.banksy.loader
 import com.github.doyaaaaaken.kotlincsv.client.CsvWriter
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.jameshpark.banksy.database.Dao
 import org.jameshpark.banksy.models.Feed
 import org.jameshpark.banksy.models.Transaction
 import org.jameshpark.banksy.utils.chunked
-import java.io.File
-import java.util.concurrent.atomic.AtomicInteger
 
 class DefaultLoader(private val dao: Dao, private val writer: CsvWriter = csvWriter()) : Loader {
     override suspend fun saveTransactions(feed: Feed, transactions: Flow<Transaction>) {
@@ -20,35 +15,6 @@ class DefaultLoader(private val dao: Dao, private val writer: CsvWriter = csvWri
             dao.saveTransactions(chunk)
             logger.info { "Saved ${chunk.size} transactions" }
         }
-    }
-
-    override suspend fun exportToCsv(filePath: String, sinceId: Int, includeHeader: Boolean) {
-        logger.info { "Exporting to $filePath" }
-        val output = File(filePath)
-
-        // create new file
-        val fileCreation = withContext(Dispatchers.IO) {
-            launch {
-                output.createNewFile()
-                if (includeHeader) {
-                    output.writeText("date,description,amount,category,critical,type,originHash\n")
-                }
-            }
-        }
-
-        val transactions = dao.getTransactionsNewerThanId(sinceId)
-
-        val counter = AtomicInteger(0)
-        fileCreation.join()
-        writer.openAsync(output, append = true) {
-            transactions.collect {
-                writeRow(it.toCsvRow())
-                if (counter.incrementAndGet() % 10 == 0) {
-                    logger.info { "Exported ${counter.get()} transactions to $filePath" }
-                }
-            }
-        }
-        logger.info { "Exported ${counter.get()} transactions to $filePath" }
     }
 
     companion object {
