@@ -7,9 +7,11 @@ data class Merchant(
     val category: Category,
     val regex: String
 ) {
+
     private val compiledRegex = regex.toRegex(RegexOption.IGNORE_CASE)
 
     fun existsIn(description: String): Boolean = compiledRegex.containsMatchIn(description)
+
 }
 
 val merchants = listOf(

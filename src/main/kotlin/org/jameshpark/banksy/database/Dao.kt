@@ -3,7 +3,6 @@ package org.jameshpark.banksy.database
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.toList
 import org.jameshpark.banksy.models.Category
 import org.jameshpark.banksy.models.Transaction
 import org.jameshpark.banksy.models.TransactionType
@@ -12,6 +11,44 @@ import java.time.Instant
 import java.time.LocalDate
 
 class Dao(private val db: Database) {
+
+    suspend fun getLatestBookmarkByName(name: String): LocalDate? {
+        val sql = "SELECT bookmark FROM bookmarks WHERE name = ? ORDER BY bookmark DESC LIMIT 1"
+        return db.query(
+            sql,
+            listOf(name)
+        ) {
+            this.getDate("bookmark")
+        }.firstOrNull()?.toLocalDate()
+    }
+
+    suspend fun saveBookmark(name: String, bookmark: LocalDate) {
+        val sql = "INSERT INTO bookmarks (name, bookmark, run_timestamp) VALUES (?, ?, ?)"
+        val params = listOf(name, bookmark, Instant.now().toEpochMilli())
+        db.execute(sql, params)
+    }
+
+    suspend fun saveTransactions(transactions: List<Transaction>) {
+        val sql = """
+            INSERT OR IGNORE INTO transactions (date, description, amount, category, critical, type, originHash)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        """.trimIndent()
+
+        val batchParams = transactions.map { it.toDbRow() }
+        db.executeBatch(sql, batchParams)
+    }
+
+    suspend fun getLatestTransactionId(): Int {
+        val sql = """
+            SELECT MAX(id) AS id
+            FROM transactions
+        """.trimIndent()
+
+        return db.query(sql) {
+            getInt("id")
+        }.firstOrNull() ?: 0
+    }
+
     suspend fun getTransactionsNewerThanId(id: Int): Flow<Transaction> {
         val sql = """
             SELECT date
@@ -39,32 +76,6 @@ class Dao(private val db: Database) {
             )
         }
 
-    }
-
-    suspend fun getLatestBookmarkByName(name: String): LocalDate? {
-        val sql = "SELECT bookmark FROM bookmarks WHERE name = ? ORDER BY bookmark DESC LIMIT 1"
-        return db.query(
-            sql,
-            listOf(name)
-        ) {
-            this.getDate("bookmark")
-        }.firstOrNull()?.toLocalDate()
-    }
-
-    suspend fun saveBookmark(name: String, bookmark: LocalDate) {
-        val sql = "INSERT INTO bookmarks (name, bookmark, run_timestamp) VALUES (?, ?, ?)"
-        val params = listOf(name, bookmark, Instant.now().toEpochMilli())
-        db.execute(sql, params)
-    }
-
-    suspend fun saveTransactions(transactions: List<Transaction>) {
-        val sql = """
-            INSERT OR IGNORE INTO transactions (date, description, amount, category, critical, type, originHash)
-            VALUES (?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
-
-        val batchParams = transactions.map { it.toDbRow() }
-        db.executeBatch(sql, batchParams)
     }
 
     suspend fun initializeDatabase() {
@@ -99,17 +110,6 @@ class Dao(private val db: Database) {
             );
         """.trimIndent()
         db.execute(sql)
-    }
-
-    suspend fun getLatestTransactionId(): Int {
-        val sql = """
-            SELECT MAX(id) AS id
-            FROM transactions
-        """.trimIndent()
-
-        return db.query(sql) {
-            getInt("id")
-        }.firstOrNull() ?: 0
     }
 
     companion object {

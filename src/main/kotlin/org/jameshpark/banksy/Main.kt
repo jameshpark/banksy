@@ -18,7 +18,7 @@ import java.time.Instant
 
 const val SOURCE_DIRECTORY = "transactions"
 
-fun main(): Unit = runBlocking {
+fun main() = runBlocking {
     val dao = Dao.fromUrl("jdbc:sqlite:database.db")
     val extractor = CsvExtractor(dao)
     val transformer = DefaultTransformer()

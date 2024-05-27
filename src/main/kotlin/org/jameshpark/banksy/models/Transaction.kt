@@ -13,6 +13,7 @@ data class Transaction(
     val type: TransactionType,
     val originHash: String
 ) {
+
     fun toCsvRow(): List<String> = listOf(
         date.toString(),
         description,
@@ -32,6 +33,7 @@ data class Transaction(
         type.name,
         originHash
     )
+
 }
 
 suspend fun Map<String, String>.toTransaction(mapper: Mapper): Transaction {

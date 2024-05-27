@@ -11,6 +11,7 @@ enum class Mapper(
     val amountColumn: String,
     val dateTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy")
 ) {
+
     AMEX_CREDIT_CARD("Date", "Description", "Amount") {
         override fun determineTransactionType(amount: BigDecimal): TransactionType =
             if (amount > BigDecimal.ZERO) TransactionType.DEBIT else TransactionType.CREDIT
@@ -27,6 +28,7 @@ enum class Mapper(
     };
 
     abstract fun determineTransactionType(amount: BigDecimal): TransactionType
+
 }
 
 val headersToMapper = mapOf(

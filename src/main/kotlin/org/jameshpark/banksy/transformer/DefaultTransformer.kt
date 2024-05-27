@@ -21,7 +21,7 @@ class DefaultTransformer : Transformer {
                 if (mapper != null) {
                     val transaction = row.toTransaction(mapper)
                     if (transaction.category == Category.UNCATEGORIZED) {
-                       logger.info { "UNCATEGORIZED transaction for merchant '${transaction.description}'" }
+                        logger.info { "UNCATEGORIZED transaction for merchant '${transaction.description}'" }
                     }
 
                     emit(transaction)

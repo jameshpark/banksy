@@ -14,6 +14,7 @@ class CsvExporter(
     private val dao: Dao,
     private val writer: CsvWriter = csvWriter()
 ) : Exporter<CsvSink> {
+
     override suspend fun export(sink: CsvSink, sinceId: Int) {
         val filePath = sink.filePath
         val includeHeader = sink.includeHeader
@@ -48,4 +49,5 @@ class CsvExporter(
     companion object {
         private val logger = KotlinLogging.logger { }
     }
+
 }

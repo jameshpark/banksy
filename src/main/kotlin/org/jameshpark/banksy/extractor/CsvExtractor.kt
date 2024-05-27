@@ -67,7 +67,7 @@ class CsvExtractor(
     }
 
     companion object {
-        private val logger = KotlinLogging.logger {}
+        private val logger = KotlinLogging.logger { }
     }
 
 }

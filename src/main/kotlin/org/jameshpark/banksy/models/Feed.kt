@@ -3,7 +3,9 @@ package org.jameshpark.banksy.models
 import java.io.File
 
 interface Feed {
+
     fun getBookmarkName(): String
+
 }
 
 class CsvFeed(val file: File) : Feed {

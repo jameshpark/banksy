@@ -10,6 +10,7 @@ import java.time.LocalDate
 import javax.lang.model.type.NullType
 
 class DefaultDatabase(private val conn: Connection) : Database {
+
     override suspend fun execute(sql: String, params: List<Any?>): Int {
         return prepareStatement(sql, params).use {
             withContext(Dispatchers.IO) {
@@ -68,4 +69,5 @@ class DefaultDatabase(private val conn: Connection) : Database {
             addBatch()
         }
     }
+
 }
