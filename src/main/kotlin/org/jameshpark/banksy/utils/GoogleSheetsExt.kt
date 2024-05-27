@@ -57,7 +57,7 @@ fun sheetsServiceFromCredentials(credentialsFilePath: String): Sheets {
 
 private fun loadCredentials(credentialsFilePath: String): GoogleClientSecrets {
     val jsonFactory = GsonFactory.getDefaultInstance()
-    val credentials: InputStream = GoogleSheetsSink::class.java.getResourceAsStream(credentialsFilePath)
+    val credentials: InputStream = Thread.currentThread().contextClassLoader.getResourceAsStream(credentialsFilePath)
         ?: throw FileNotFoundException("Resource not found: $credentialsFilePath")
     return GoogleClientSecrets.load(jsonFactory, InputStreamReader(credentials))
 }
