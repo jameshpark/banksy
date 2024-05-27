@@ -5,11 +5,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.jameshpark.banksy.database.Dao
 import org.jameshpark.banksy.exporter.CsvExporter
+import org.jameshpark.banksy.exporter.GoogleSheetsExporter
 import org.jameshpark.banksy.extractor.CsvExtractor
 import org.jameshpark.banksy.loader.DefaultLoader
 import org.jameshpark.banksy.models.CsvFeed
 import org.jameshpark.banksy.models.CsvSink
+import org.jameshpark.banksy.models.GoogleSheetsSink
 import org.jameshpark.banksy.transformer.DefaultTransformer
+import org.jameshpark.banksy.utils.sheetsServiceFromCredentials
 import java.io.File
 import java.time.Instant
 
@@ -21,6 +24,7 @@ fun main(): Unit = runBlocking {
     val transformer = DefaultTransformer()
     val loader = DefaultLoader(dao)
     val csvExporter = CsvExporter(dao)
+    val googleSheetsExporter = GoogleSheetsExporter(dao, sheetsServiceFromCredentials("REPLACE_ME"))
 
     val directory = File(SOURCE_DIRECTORY)
     val csvFeeds = if (directory.exists() && directory.isDirectory) {
@@ -43,4 +47,5 @@ fun main(): Unit = runBlocking {
 
     val filePath = "exports/export_${Instant.now().epochSecond}.csv"
     csvExporter.export(CsvSink(filePath), transactionIdBeforeLoad)
+    googleSheetsExporter.export(GoogleSheetsSink("spreadsheetId", "Transactions!A2"), transactionIdBeforeLoad)
 }

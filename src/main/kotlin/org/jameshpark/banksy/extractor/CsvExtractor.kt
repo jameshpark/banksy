@@ -3,9 +3,11 @@ package org.jameshpark.banksy.extractor
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import io.github.oshai.kotlinlogging.KotlinLogging
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.withContext
 import org.jameshpark.banksy.database.Dao
 import org.jameshpark.banksy.models.CsvFeed
 import org.jameshpark.banksy.transformer.headersToMapper
@@ -27,10 +29,12 @@ class CsvExtractor(
         return rowsSincePreviousBookmark
     }
 
-    private fun readCsvRows(file: File): Pair<Flow<Map<String, String>>, LocalDate> {
+    private suspend fun readCsvRows(file: File): Pair<Flow<Map<String, String>>, LocalDate> {
         require(file.isFile && file.extension.lowercase() == "csv") { "${file.name} is not a csv file" }
 
-        val rows = reader.readAllWithHeader(file)
+        val rows = withContext(Dispatchers.IO) {
+            reader.readAllWithHeader(file)
+        }
         val bookmark = getTransactionDate(rows.maxBy { getTransactionDate(it) })
         logger.info { "Found new bookmark $bookmark in ${file.name}" }
         return rows.asFlow() to bookmark

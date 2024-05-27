@@ -4,7 +4,6 @@ import com.github.doyaaaaaken.kotlincsv.client.CsvWriter
 import com.github.doyaaaaaken.kotlincsv.dsl.csvWriter
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.jameshpark.banksy.database.Dao
 import org.jameshpark.banksy.models.CsvSink
@@ -23,22 +22,21 @@ class CsvExporter(
         val output = File(filePath)
 
         // create new file
-        val fileCreation = withContext(Dispatchers.IO) {
-            launch {
-                output.createNewFile()
-                if (includeHeader) {
-                    output.writeText("date,description,amount,category,critical,type,originHash\n")
-                }
+        withContext(Dispatchers.IO) {
+            output.createNewFile()
+            if (includeHeader) {
+                output.writeText("date,description,amount,category,critical,type,originHash\n")
             }
         }
 
         val transactions = dao.getTransactionsNewerThanId(sinceId)
 
         val counter = AtomicInteger(0)
-        fileCreation.join()
         writer.openAsync(output, append = true) {
             transactions.collect {
-                writeRow(it.toCsvRow())
+                withContext(Dispatchers.IO) {
+                    writeRow(it.toCsvRow())
+                }
                 if (counter.incrementAndGet() % 10 == 0) {
                     logger.info { "Exported ${counter.get()} transactions to $filePath" }
                 }

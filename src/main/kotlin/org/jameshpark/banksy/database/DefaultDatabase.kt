@@ -1,7 +1,6 @@
 package org.jameshpark.banksy.database
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
@@ -14,9 +13,7 @@ class DefaultDatabase(private val conn: Connection) : Database {
     override suspend fun execute(sql: String, params: List<Any?>): Int {
         return prepareStatement(sql, params).use {
             withContext(Dispatchers.IO) {
-                async {
-                    it.executeUpdate()
-                }.await()
+                it.executeUpdate()
             }
         }
     }
@@ -25,9 +22,7 @@ class DefaultDatabase(private val conn: Connection) : Database {
         val ps = prepareBatchStatement(sql, batchParams)
         val updateCounts = ps.use {
             withContext(Dispatchers.IO) {
-                async {
-                    it.executeBatch()
-                }.await()
+                it.executeBatch()
             }
         }
         return updateCounts.toList()
@@ -36,9 +31,7 @@ class DefaultDatabase(private val conn: Connection) : Database {
     override suspend fun <T> query(sql: String, params: List<Any?>, transform: ResultSet.() -> T): Flow<T> = flow {
         prepareStatement(sql, params).use { preparedStatement ->
             val rs = withContext(Dispatchers.IO) {
-                async {
-                    preparedStatement.executeQuery()
-                }.await()
+                preparedStatement.executeQuery()
             }
 
             while (rs.next()) {
