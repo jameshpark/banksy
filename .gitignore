@@ -39,8 +39,8 @@ build/
 
 ### Banksy ###
 database.db
-transactions-import/**
-transactions-export/**
-transactions-extracted/**
+#transactions-import/**
+#transactions-export/**
+#transactions-extracted/**
 local.properties
 tokens/
