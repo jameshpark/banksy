@@ -37,8 +37,10 @@ build/
 ### Mac OS ###
 .DS_Store
 
-transactions/
-transactions-extracted/
-exports/
-
+### Banksy ###
 database.db
+transactions-import/**
+transactions-export/**
+transactions-extracted/**
+local.properties
+tokens/
