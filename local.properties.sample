@@ -1,0 +1,9 @@
+app.import.transactions.from-directory=transactions-import
+app.export.transactions.to-directory=transactions-export
+
+app.database.url=jdbc:sqlite:database.db
+
+google.client.secret.json=
+google.sheets.spreadsheet-id=
+google.sheets.spreadsheet-name=
+google.sheets.sheet-name=

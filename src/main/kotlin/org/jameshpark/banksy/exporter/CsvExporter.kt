@@ -24,6 +24,7 @@ class CsvExporter(
 
         // create new file
         withContext(Dispatchers.IO) {
+            output.parentFile.mkdirs()
             output.createNewFile()
             if (includeHeader) {
                 output.writeText("date,description,amount,category,critical,type,originHash\n")

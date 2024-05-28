@@ -6,9 +6,11 @@ import kotlinx.coroutines.flow.firstOrNull
 import org.jameshpark.banksy.models.Category
 import org.jameshpark.banksy.models.Transaction
 import org.jameshpark.banksy.models.TransactionType
+import org.jameshpark.banksy.utils.require
 import java.sql.DriverManager
 import java.time.Instant
 import java.time.LocalDate
+import java.util.*
 
 class Dao(private val db: Database) {
 
@@ -113,13 +115,17 @@ class Dao(private val db: Database) {
     }
 
     companion object {
+
         private val logger = KotlinLogging.logger { }
 
-        fun fromUrl(url: String): Dao {
+        fun fromProperties(properties: Properties) = fromUrl(properties.require("app.database.url"))
+
+        private fun fromUrl(url: String): Dao {
             val dbConnection = DriverManager.getConnection(url)
             val db = DefaultDatabase(dbConnection)
             logger.info { "Connected to database" }
             return Dao(db)
         }
+
     }
 }

@@ -1,5 +1,6 @@
 package org.jameshpark.banksy
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -8,29 +9,32 @@ import org.jameshpark.banksy.exporter.CsvExporter
 import org.jameshpark.banksy.exporter.GoogleSheetsExporter
 import org.jameshpark.banksy.extractor.CsvExtractor
 import org.jameshpark.banksy.loader.DefaultLoader
-import org.jameshpark.banksy.models.CsvFeed
 import org.jameshpark.banksy.models.CsvSink
 import org.jameshpark.banksy.models.GoogleSheetsSink
 import org.jameshpark.banksy.transformer.DefaultTransformer
-import org.jameshpark.banksy.utils.sheetsServiceFromCredentials
-import java.io.File
-import java.time.Instant
+import org.jameshpark.banksy.utils.csvFeedsFromProperties
+import org.jameshpark.banksy.utils.loadProperties
+import org.jameshpark.banksy.utils.sheetsServiceFromProperties
 
-const val SOURCE_DIRECTORY = "transactions"
+private val logger = KotlinLogging.logger { }
 
 fun main() = runBlocking {
-    val dao = Dao.fromUrl("jdbc:sqlite:database.db")
+    val properties = loadProperties()
+
+    val dao = Dao.fromProperties(properties)
+
     val extractor = CsvExtractor(dao)
     val transformer = DefaultTransformer()
     val loader = DefaultLoader(dao)
-    val csvExporter = CsvExporter(dao)
-    val googleSheetsExporter = GoogleSheetsExporter(dao, sheetsServiceFromCredentials("REPLACE_ME"))
 
-    val directory = File(SOURCE_DIRECTORY)
-    val csvFeeds = if (directory.exists() && directory.isDirectory) {
-        directory.walk().filter { it.isFile && it.extension.lowercase() == "csv" }.map { CsvFeed(it) }.toList()
-    } else {
-        emptyList()
+    val csvExporter = CsvExporter(dao)
+    val googleSheetsExporter = GoogleSheetsExporter(dao, sheetsServiceFromProperties(properties))
+
+    val csvFeeds = csvFeedsFromProperties(properties).also {
+        if (it.isEmpty()) {
+            logger.info { "No transaction csv files found. Quitting..." }
+            return@runBlocking
+        }
     }
 
     val transactionIdBeforeLoad = dao.getLatestTransactionId()
@@ -45,7 +49,20 @@ fun main() = runBlocking {
         }
     }
 
-    val filePath = "exports/export_${Instant.now().epochSecond}.csv"
-    csvExporter.export(CsvSink(filePath), transactionIdBeforeLoad)
-    googleSheetsExporter.export(GoogleSheetsSink("spreadsheetId", "Transactions!A2"), transactionIdBeforeLoad)
+    coroutineScope {
+        launch {
+            csvExporter.export(
+                CsvSink.fromProperties(properties),
+                transactionIdBeforeLoad
+            )
+        }
+        launch {
+            googleSheetsExporter.export(
+                GoogleSheetsSink.fromProperties(properties),
+                transactionIdBeforeLoad
+            )
+        }
+    }
+
+    logger.info { "Application shutting down." }
 }

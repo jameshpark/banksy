@@ -20,7 +20,7 @@ class GoogleSheetsExporter(
         val transactionRows = dao.getTransactionsNewerThanId(sinceId).map { it.toCsvRow() }.toList()
 
         sheetsService.appendRows(spreadsheetId, sheetName, transactionRows)
-        logger.info { "Appended ${transactionRows.size} rows to $spreadsheetId" }
+        logger.info { "Appended ${transactionRows.size} rows to ${sink.spreadsheetName}.$sheetName" }
     }
 
     companion object {

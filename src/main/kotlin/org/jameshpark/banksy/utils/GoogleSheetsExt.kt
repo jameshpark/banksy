@@ -13,11 +13,9 @@ import com.google.api.services.sheets.v4.SheetsScopes
 import com.google.api.services.sheets.v4.model.ValueRange
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import org.jameshpark.banksy.models.GoogleSheetsSink
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.InputStream
-import java.io.InputStreamReader
+import java.io.StringReader
+import java.util.*
 
 suspend fun Sheets.appendRows(spreadsheetId: String, sheetName: String, rows: List<List<Any>>) {
     val firstEmptyRow = getFirstEmptyRow(spreadsheetId, sheetName)
@@ -42,8 +40,13 @@ suspend fun Sheets.getFirstEmptyRow(spreadsheetId: String, sheetName: String): I
     return values.size + 1
 }
 
-fun sheetsServiceFromCredentials(credentialsFilePath: String): Sheets {
-    val clientSecrets = loadCredentials(credentialsFilePath)
+fun sheetsServiceFromProperties(properties: Properties): Sheets {
+    val secretJson = properties.require("google.client.secret.json")
+    return sheetsServiceFromSecretJson(secretJson)
+}
+
+fun sheetsServiceFromSecretJson(secretJson: String): Sheets {
+    val clientSecrets = loadGoogleClientSecrets(secretJson)
     val credential = getUserAuthorization(clientSecrets)
 
     return Sheets.Builder(
@@ -55,11 +58,9 @@ fun sheetsServiceFromCredentials(credentialsFilePath: String): Sheets {
         .build()
 }
 
-private fun loadCredentials(credentialsFilePath: String): GoogleClientSecrets {
+private fun loadGoogleClientSecrets(credentialsJson: String): GoogleClientSecrets {
     val jsonFactory = GsonFactory.getDefaultInstance()
-    val credentials: InputStream = Thread.currentThread().contextClassLoader.getResourceAsStream(credentialsFilePath)
-        ?: throw FileNotFoundException("Resource not found: $credentialsFilePath")
-    return GoogleClientSecrets.load(jsonFactory, InputStreamReader(credentials))
+    return GoogleClientSecrets.load(jsonFactory, StringReader(credentialsJson))
 }
 
 private fun getUserAuthorization(clientSecrets: GoogleClientSecrets): Credential {
