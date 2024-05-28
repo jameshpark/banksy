@@ -1,9 +1,14 @@
 package org.jameshpark.banksy.database
 
+import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import liquibase.Contexts
+import liquibase.Liquibase
+import liquibase.database.jvm.JdbcConnection
+import liquibase.resource.ClassLoaderResourceAccessor
 import java.math.BigDecimal
 import java.sql.*
 import java.time.LocalDate
@@ -68,6 +73,30 @@ class DefaultDatabase(private val conn: Connection) : Database {
             mapParameters(it)
             addBatch()
         }
+    }
+
+    companion object {
+
+        private val logger = KotlinLogging.logger { }
+
+        fun fromUrl(url: String): DefaultDatabase {
+            val conn = DriverManager.getConnection(url)
+            logger.info { "Connected to database" }
+
+            runDatabaseMigrations(conn)
+
+            return DefaultDatabase(conn)
+        }
+
+        private fun runDatabaseMigrations(conn: Connection) {
+            val liquibase = Liquibase(
+                "db/changelog/db.changelog-master.xml",
+                ClassLoaderResourceAccessor(),
+                JdbcConnection(conn)
+            )
+            liquibase.update(Contexts())
+        }
+
     }
 
 }

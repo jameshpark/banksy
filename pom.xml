@@ -129,6 +129,11 @@
             <artifactId>google-api-services-sheets</artifactId>
             <version>v4-rev20240514-2.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>4.28.0</version>
+        </dependency>
     </dependencies>
 
 </project>
