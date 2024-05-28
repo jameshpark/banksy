@@ -3,7 +3,6 @@ package org.jameshpark.banksy
 import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.jameshpark.banksy.database.Dao
 import org.jameshpark.banksy.exporter.CsvExporter
 import org.jameshpark.banksy.exporter.GoogleSheetsExporter
@@ -13,12 +12,13 @@ import org.jameshpark.banksy.models.CsvSink
 import org.jameshpark.banksy.models.GoogleSheetsSink
 import org.jameshpark.banksy.transformer.DefaultTransformer
 import org.jameshpark.banksy.utils.csvFeedsFromProperties
+import org.jameshpark.banksy.utils.launchApp
 import org.jameshpark.banksy.utils.loadProperties
 import org.jameshpark.banksy.utils.sheetsServiceFromProperties
 
 private val logger = KotlinLogging.logger { }
 
-fun main() = runBlocking {
+fun main() = launchApp {
     val properties = loadProperties()
 
     val dao = Dao.fromProperties(properties)
@@ -33,7 +33,7 @@ fun main() = runBlocking {
     val csvFeeds = csvFeedsFromProperties(properties).also {
         if (it.isEmpty()) {
             logger.info { "No transaction csv files found. Quitting..." }
-            return@runBlocking
+            return@launchApp
         }
     }
 
@@ -63,6 +63,4 @@ fun main() = runBlocking {
             )
         }
     }
-
-    logger.info { "Application shutting down." }
 }
