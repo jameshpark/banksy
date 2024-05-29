@@ -29,7 +29,7 @@ fun getResourceAsStream(path: String) =
 fun getFileAsStream(path: String) = try {
     FileInputStream(path)
 } catch (e: FileNotFoundException) {
-    logger.info(e) { "'$path' does not exist in project, skipping." }
+    logger.info { "'$path' does not exist in project, skipping." }
     null
 }
 
@@ -44,4 +44,10 @@ fun csvFeedsFromProperties(properties: Properties): List<CsvFeed> {
 }
 
 fun Properties.require(key: String): String =
-    getProperty(key) ?: throw IllegalArgumentException("Property '$key' not found")
+    getProperty(key)?.let { value ->
+        if (value.isBlank()) {
+            throw IllegalArgumentException("Property '$key' has no value")
+        } else {
+            value
+        }
+    } ?: throw IllegalArgumentException("Property '$key' not found")
