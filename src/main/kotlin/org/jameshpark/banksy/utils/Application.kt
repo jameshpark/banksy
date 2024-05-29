@@ -7,8 +7,8 @@ import java.time.Duration
 private val logger = KotlinLogging.logger { }
 
 fun launchApp(block: suspend CoroutineScope.() -> Unit) = try {
-    runBlocking(Dispatchers.Default) {
-        val applicationJob = launch(coroutineContext + CoroutineName("application-coroutine")) {
+    runBlocking {
+        val applicationJob = launch(Dispatchers.Default + CoroutineName("application-coroutine")) {
             logger.info { "Application started." }
             try {
                 block()
