@@ -1,13 +1,11 @@
 package org.jameshpark.banksy.database
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import org.jameshpark.banksy.models.Category
 import org.jameshpark.banksy.models.Transaction
 import org.jameshpark.banksy.models.TransactionType
 import org.jameshpark.banksy.utils.require
-import java.sql.DriverManager
 import java.time.Instant
 import java.time.LocalDate
 import java.util.*
