@@ -17,22 +17,28 @@ fun launchApp(block: suspend CoroutineScope.() -> Unit) = try {
             }
         }
 
-        Runtime.getRuntime().addShutdownHook(Thread {
-            if (applicationJob.isActive) {
-                logger.info { "Received termination signal. Shutting down the application." }
-                try {
-                    runBlocking {
-                        withTimeout(Duration.ofSeconds(10).toMillis()) {
-                            applicationJob.cancelAndJoin()
+        Runtime.getRuntime().addShutdownHook(
+            Thread(
+                {
+                    if (applicationJob.isActive) {
+                        logger.info { "Received termination signal. Shutting down the application." }
+                        try {
+                            runBlocking {
+                                withTimeout(Duration.ofSeconds(10).toMillis()) {
+                                    applicationJob.cancelAndJoin()
+                                }
+                            }
+                        } catch (_: CancellationException) {
+                            // Application coroutine shutdown was interrupted/timed out.
+                            // Let the JVM shutdown and take the underlying thread with it.
+                        } catch (t: Throwable) {
+                            logger.error(t) { "Error shutting down the application. Terminating the app." }
                         }
                     }
-                } catch (_: CancellationException) {
-                    // This is not an error. Don't let it interrupt shutdown.
-                } catch (t: Throwable) {
-                    logger.error(t) { "Error shutting down the application. Terminating the app." }
-                }
-            }
-        })
+                },
+                "shutdown"
+            )
+        )
     }
 } catch (_: CancellationException) {
     // This is not an exception we want to float up to the caller's context.
