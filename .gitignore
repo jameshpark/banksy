@@ -43,4 +43,5 @@ transactions-import/**
 transactions-export/**
 transactions-extracted/**
 local.properties
+local.merchants.json
 tokens/
