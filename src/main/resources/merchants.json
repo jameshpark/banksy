@@ -1,0 +1,622 @@
+[
+  {
+    "name": "Airbnb",
+    "category": "VACATION",
+    "regex": "airbnb"
+  },
+  {
+    "name": "Airport (facilities/parking)",
+    "category": "CAR_USE_EXPENSE",
+    "regex": "airpo?r?t?"
+  },
+  {
+    "name": "Alaska Airlines",
+    "category": "VACATION",
+    "regex": "alaska\\s?air?l?i?n?e?s?"
+  },
+  {
+    "name": "Amazon Prime Membership",
+    "category": "PRODUCTIVITY",
+    "regex": "ama?zo?n\\spri?me?"
+  },
+  {
+    "name": "Amazon Prime Video",
+    "category": "STREAMING",
+    "regex": "prime\\svideo"
+  },
+  {
+    "name": "Amazon Web Services",
+    "category": "HOBBIES",
+    "regex": "ama?zo?n\\sweb\\sse?r?vi?ce?s?"
+  },
+  {
+    "name": "Amazon",
+    "category": "UNCATEGORIZED",
+    "regex": "ama?zo?n(?=\\s?ma?r?ke?t?pl?a?c?e?|\\s?tips|\\.com)"
+  },
+  {
+    "name": "American Airlines",
+    "category": "VACATION",
+    "regex": "american\\s?air?l?i?n?e?s?"
+  },
+  {
+    "name": "Apple Store",
+    "category": "PRODUCTIVITY",
+    "regex": "apple(?=\\s*store|\\s*online|\\.com/us)"
+  },
+  {
+    "name": "AT&T",
+    "category": "PHONE",
+    "regex": "at&?t(?=\\s*mobility|\\*bill)"
+  },
+  {
+    "name": "Audible",
+    "category": "HOBBIES",
+    "regex": "audible(?=,\\sinc|\\.com)"
+  },
+  {
+    "name": "Autozone",
+    "category": "CAR_UPKEEP",
+    "regex": "autozone"
+  },
+  {
+    "name": "Best Buy",
+    "category": "PRODUCTIVITY",
+    "regex": "best\\s?buy"
+  },
+  {
+    "name": "BP Gas",
+    "category": "GAS",
+    "regex": "bp#"
+  },
+  {
+    "name": "build.com",
+    "category": "HOME_IMPROVEMENT",
+    "regex": "build\\.com"
+  },
+  {
+    "name": "Cava",
+    "category": "RESTAURANTS",
+    "regex": "cava"
+  },
+  {
+    "name": "Chipotle",
+    "category": "RESTAURANTS",
+    "regex": "chipotle"
+  },
+  {
+    "name": "Contains 'airline'",
+    "category": "VACATION",
+    "regex": "air\\s?lines?"
+  },
+  {
+    "name": "Contains 'barbeque'",
+    "category": "RESTAURANTS",
+    "regex": "barbeque"
+  },
+  {
+    "name": "Contains 'bbq'",
+    "category": "RESTAURANTS",
+    "regex": "bbq"
+  },
+  {
+    "name": "Contains 'beer'",
+    "category": "RESTAURANTS",
+    "regex": "beer"
+  },
+  {
+    "name": "Contains 'beerworks'",
+    "category": "RESTAURANTS",
+    "regex": "beerworks"
+  },
+  {
+    "name": "Contains 'bistro'",
+    "category": "RESTAURANTS",
+    "regex": "bistro"
+  },
+  {
+    "name": "Contains 'bread'",
+    "category": "RESTAURANTS",
+    "regex": "bread"
+  },
+  {
+    "name": "Contains 'brewing'",
+    "category": "RESTAURANTS",
+    "regex": "brewing"
+  },
+  {
+    "name": "Contains 'burger'",
+    "category": "RESTAURANTS",
+    "regex": "burger"
+  },
+  {
+    "name": "Contains 'cafe'",
+    "category": "RESTAURANTS",
+    "regex": "cafe"
+  },
+  {
+    "name": "Contains 'chicken'",
+    "category": "RESTAURANTS",
+    "regex": "chicken"
+  },
+  {
+    "name": "Contains 'china'",
+    "category": "RESTAURANTS",
+    "regex": "china"
+  },
+  {
+    "name": "Contains 'cider'",
+    "category": "RESTAURANTS",
+    "regex": "cider"
+  },
+  {
+    "name": "Contains 'coffee'",
+    "category": "COFFEE",
+    "regex": "coffee"
+  },
+  {
+    "name": "Contains 'concessions'",
+    "category": "RESTAURANTS",
+    "regex": "concessions"
+  },
+  {
+    "name": "Contains 'cookie'",
+    "category": "RESTAURANTS",
+    "regex": "cookie"
+  },
+  {
+    "name": "Contains 'cuisine'",
+    "category": "RESTAURANTS",
+    "regex": "cuisine"
+  },
+  {
+    "name": "Contains 'dentist'",
+    "category": "DENTAL",
+    "regex": "dentist"
+  },
+  {
+    "name": "Contains 'dessert'",
+    "category": "RESTAURANTS",
+    "regex": "dessert"
+  },
+  {
+    "name": "Contains 'diner'",
+    "category": "RESTAURANTS",
+    "regex": "diner"
+  },
+  {
+    "name": "Contains 'dining'",
+    "category": "RESTAURANTS",
+    "regex": "dining"
+  },
+  {
+    "name": "Contains 'food hall'",
+    "category": "RESTAURANTS",
+    "regex": "food\\s*ha?l?l?"
+  },
+  {
+    "name": "Contains 'food truck'",
+    "category": "RESTAURANTS",
+    "regex": "food\\s*tru?c?k?"
+  },
+  {
+    "name": "Contains 'grill'",
+    "category": "RESTAURANTS",
+    "regex": "grille?"
+  },
+  {
+    "name": "Contains 'gyro'",
+    "category": "RESTAURANTS",
+    "regex": "gyro"
+  },
+  {
+    "name": "Contains 'halal'",
+    "category": "RESTAURANTS",
+    "regex": "halal"
+  },
+  {
+    "name": "Contains 'ice cream'",
+    "category": "RESTAURANTS",
+    "regex": "ice\\s*cream"
+  },
+  {
+    "name": "Contains 'japanese'",
+    "category": "RESTAURANTS",
+    "regex": "japane?s?e?"
+  },
+  {
+    "name": "Contains 'kitchen'",
+    "category": "RESTAURANTS",
+    "regex": "kitchen"
+  },
+  {
+    "name": "Contains 'mexican'",
+    "category": "RESTAURANTS",
+    "regex": "mexic?a?n?"
+  },
+  {
+    "name": "Contains 'music'",
+    "category": "ENTERTAINMENT",
+    "regex": "music"
+  },
+  {
+    "name": "Contains 'noodle'",
+    "category": "RESTAURANTS",
+    "regex": "noodl?e?s?"
+  },
+  {
+    "name": "Contains 'parking'",
+    "category": "CAR_USE_EXPENSE",
+    "regex": "parking"
+  },
+  {
+    "name": "Contains 'pharmacy'",
+    "category": "MEDICAL",
+    "regex": "pharma?c?y?"
+  },
+  {
+    "name": "Contains 'pizza'",
+    "category": "RESTAURANTS",
+    "regex": "pizza"
+  },
+  {
+    "name": "Contains 'ramen'",
+    "category": "RESTAURANTS",
+    "regex": "ramen"
+  },
+  {
+    "name": "Contains 'restaurant'",
+    "category": "RESTAURANTS",
+    "regex": "restaur?a?n?t?"
+  },
+  {
+    "name": "Contains 'roaster'",
+    "category": "COFFEE",
+    "regex": "roaster"
+  },
+  {
+    "name": "Contains 'sandwich'",
+    "category": "RESTAURANTS",
+    "regex": "sandwich"
+  },
+  {
+    "name": "Contains 'souvenir'",
+    "category": "VACATION",
+    "regex": "souvenir"
+  },
+  {
+    "name": "Contains 'sushi'",
+    "category": "RESTAURANTS",
+    "regex": "sushi"
+  },
+  {
+    "name": "Contains 'taco'",
+    "category": "RESTAURANTS",
+    "regex": "taco"
+  },
+  {
+    "name": "Contains 'taqueria'",
+    "category": "RESTAURANTS",
+    "regex": "taqueria"
+  },
+  {
+    "name": "Contains 'thai'",
+    "category": "RESTAURANTS",
+    "regex": "thai"
+  },
+  {
+    "name": "Contains 'travel'",
+    "category": "VACATION",
+    "regex": "travel"
+  },
+  {
+    "name": "Contains 'vintage'",
+    "category": "HOME_IMPROVEMENT",
+    "regex": "vintage"
+  },
+  {
+    "name": "Contains 'vitamin'",
+    "category": "GROCERIES",
+    "regex": "vitamin"
+  },
+  {
+    "name": "Contains 'waffle'",
+    "category": "RESTAURANTS",
+    "regex": "waffle"
+  },
+  {
+    "name": "Contains 'wine'",
+    "category": "RESTAURANTS",
+    "regex": "wine"
+  },
+  {
+    "name": "Costco",
+    "category": "GROCERIES",
+    "regex": "costco"
+  },
+  {
+    "name": "Crate and Barrel",
+    "category": "HOME_IMPROVEMENT",
+    "regex": "crate\\s*(and|&amp;)\\s*barrel"
+  },
+  {
+    "name": "Delta Airlines",
+    "category": "VACATION",
+    "regex": "delta\\s?air?l?i?n?e?s?"
+  },
+  {
+    "name": "Domino's",
+    "category": "RESTAURANTS",
+    "regex": "domino'?s"
+  },
+  {
+    "name": "DoorDash",
+    "category": "RESTAURANTS",
+    "regex": "doordash"
+  },
+  {
+    "name": "Exxon",
+    "category": "GAS",
+    "regex": "exxon"
+  },
+  {
+    "name": "FedEx",
+    "category": "PRODUCTIVITY",
+    "regex": "fedex"
+  },
+  {
+    "name": "Frontier Airlines",
+    "category": "VACATION",
+    "regex": "frontier\\s?air?l?i?n?e?s?"
+  },
+  {
+    "name": "Google Fiber",
+    "category": "UTILITIES",
+    "regex": "google(?=\\s\\*fiber|\\s\\*services)"
+  },
+  {
+    "name": "GrubHub",
+    "category": "RESTAURANTS",
+    "regex": "grubhub"
+  },
+  {
+    "name": "Hilton",
+    "category": "VACATION",
+    "regex": "hilton"
+  },
+  {
+    "name": "Home Goods",
+    "category": "HOME_IMPROVEMENT",
+    "regex": "home\\s*goods"
+  },
+  {
+    "name": "IKEA",
+    "category": "HOME_IMPROVEMENT",
+    "regex": "ikea"
+  },
+  {
+    "name": "Instacart",
+    "category": "GROCERIES",
+    "regex": "instacart"
+  },
+  {
+    "name": "Jeni's Ice Cream",
+    "category": "RESTAURANTS",
+    "regex": "jeni'?s"
+  },
+  {
+    "name": "Jimmy John's",
+    "category": "RESTAURANTS",
+    "regex": "jimmy\\sjohns"
+  },
+  {
+    "name": "LinkedIn",
+    "category": "PRODUCTIVITY",
+    "regex": "linkedin"
+  },
+  {
+    "name": "Lowe's",
+    "category": "HOME_UPKEEP",
+    "regex": "lowe'?s"
+  },
+  {
+    "name": "Lyft",
+    "category": "TRANSPORTATION",
+    "regex": "lyft"
+  },
+  {
+    "name": "McDonald's",
+    "category": "RESTAURANTS",
+    "regex": "mcdonald'?s"
+  },
+  {
+    "name": "National Car Rental",
+    "category": "VACATION",
+    "regex": "national\\s*car"
+  },
+  {
+    "name": "New Balance",
+    "category": "CLOTHING",
+    "regex": "new\\sbalance"
+  },
+  {
+    "name": "New York Times",
+    "category": "PRODUCTIVITY",
+    "regex": "ne?w?\\s*yo?r?k?\\s*times"
+  },
+  {
+    "name": "Nike",
+    "category": "CLOTHING",
+    "regex": "nike"
+  },
+  {
+    "name": "Nordstrom",
+    "category": "CLOTHING",
+    "regex": "nordstrom"
+  },
+  {
+    "name": "Office Depot",
+    "category": "PRODUCTIVITY",
+    "regex": "office\\s*depot"
+  },
+  {
+    "name": "Party City",
+    "category": "GIFT_DONATION",
+    "regex": "party\\s*city"
+  },
+  {
+    "name": "Peacock",
+    "category": "STREAMING",
+    "regex": "peacock"
+  },
+  {
+    "name": "Petco",
+    "category": "PET",
+    "regex": "petco"
+  },
+  {
+    "name": "Petsmart",
+    "category": "PET",
+    "regex": "petsmart"
+  },
+  {
+    "name": "Philips",
+    "category": "ESSENTIALS",
+    "regex": "philips"
+  },
+  {
+    "name": "Pilot",
+    "category": "GAS",
+    "regex": "pilot"
+  },
+  {
+    "name": "Popeye's",
+    "category": "RESTAURANTS",
+    "regex": "popeye'?s"
+  },
+  {
+    "name": "Saks",
+    "category": "ESSENTIALS",
+    "regex": "saks"
+  },
+  {
+    "name": "Shell",
+    "category": "GAS",
+    "regex": "shell"
+  },
+  {
+    "name": "Sonic Drive In",
+    "category": "RESTAURANTS",
+    "regex": "sonic\\s*drive\\s*in"
+  },
+  {
+    "name": "Spectrum",
+    "category": "UTILITIES",
+    "regex": "spectrum"
+  },
+  {
+    "name": "St. Regis",
+    "category": "VACATION",
+    "regex": "st\\s*\\.?\\s*regis"
+  },
+  {
+    "name": "Sunoco",
+    "category": "GAS",
+    "regex": "sunoco"
+  },
+  {
+    "name": "Target",
+    "category": "GROCERIES",
+    "regex": "target"
+  },
+  {
+    "name": "The Container Store",
+    "category": "HOME_IMPROVEMENT",
+    "regex": "container\\s*store"
+  },
+  {
+    "name": "The Home Depot",
+    "category": "HOME_UPKEEP",
+    "regex": "home\\s*depot"
+  },
+  {
+    "name": "Trader Joe's",
+    "category": "GROCERIES",
+    "regex": "trader\\sjoe'?s"
+  },
+  {
+    "name": "Uber Eats",
+    "category": "RESTAURANTS",
+    "regex": "uber\\seats"
+  },
+  {
+    "name": "Uber One",
+    "category": "RESTAURANTS",
+    "regex": "uber\\sone"
+  },
+  {
+    "name": "Uber Trip",
+    "category": "TRANSPORTATION",
+    "regex": "uber\\s*trip"
+  },
+  {
+    "name": "Uber",
+    "category": "TRANSPORTATION",
+    "regex": "uber"
+  },
+  {
+    "name": "UPS Store",
+    "category": "PRODUCTIVITY",
+    "regex": "ups\\s*store"
+  },
+  {
+    "name": "USPS",
+    "category": "PRODUCTIVITY",
+    "regex": "usps"
+  },
+  {
+    "name": "Venmo",
+    "category": "UNCATEGORIZED",
+    "regex": "venmo"
+  },
+  {
+    "name": "Wal-Mart",
+    "category": "GROCERIES",
+    "regex": "wal-mart"
+  },
+  {
+    "name": "Walgreens",
+    "category": "MEDICAL",
+    "regex": "walgreens"
+  },
+  {
+    "name": "Wawa",
+    "category": "GROCERIES",
+    "regex": "wawa"
+  },
+  {
+    "name": "Wegman's",
+    "category": "GROCERIES",
+    "regex": "wegman'?s"
+  },
+  {
+    "name": "Wendy's",
+    "category": "RESTAURANTS",
+    "regex": "wendy'?s"
+  },
+  {
+    "name": "West Elm",
+    "category": "HOME_IMPROVEMENT",
+    "regex": "west\\selm"
+  },
+  {
+    "name": "Whole Foods",
+    "category": "GROCERIES",
+    "regex": "whole(\\s*foods|\\s*fds)"
+  },
+  {
+    "name": "YouTube Premium",
+    "category": "STREAMING",
+    "regex": "youtubepremium"
+  }
+]

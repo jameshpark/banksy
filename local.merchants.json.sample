@@ -1,0 +1,47 @@
+[
+  {
+    "name": "Airbnb",
+    "category": "VACATION",
+    "regex": "airbnb"
+  },
+  {
+    "name": "Airport (facilities/parking)",
+    "category": "CAR_USE_EXPENSE",
+    "regex": "airpo?r?t?"
+  },
+  {
+    "name": "Alamo Rental",
+    "category": "VACATION",
+    "regex": "alamo\\s?rent"
+  },
+  {
+    "name": "Alaska Airlines",
+    "category": "VACATION",
+    "regex": "alaska\\s?air?l?i?n?e?s?"
+  },
+  {
+    "name": "Amazon Prime Membership",
+    "category": "PRODUCTIVITY",
+    "regex": "ama?zo?n\\spri?me?"
+  },
+  {
+    "name": "Amazon Prime Video",
+    "category": "STREAMING",
+    "regex": "prime\\svideo"
+  },
+  {
+    "name": "Amazon Web Services",
+    "category": "HOBBIES",
+    "regex": "ama?zo?n\\sweb\\sse?r?vi?ce?s?"
+  },
+  {
+    "name": "Amazon",
+    "category": "UNCATEGORIZED",
+    "regex": "ama?zo?n(?=\\s?ma?r?ke?t?pl?a?c?e?|\\s?tips|\\.com)"
+  },
+  {
+    "name": "American Airlines",
+    "category": "VACATION",
+    "regex": "american\\s?air?l?i?n?e?s?"
+  }
+]
