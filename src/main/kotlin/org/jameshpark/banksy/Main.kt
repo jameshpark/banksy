@@ -4,6 +4,7 @@ import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import org.jameshpark.banksy.database.Dao
+import org.jameshpark.banksy.database.DefaultDatabase
 import org.jameshpark.banksy.exporter.CsvExporter
 import org.jameshpark.banksy.exporter.GoogleSheetsExporter
 import org.jameshpark.banksy.extractor.CsvExtractor
@@ -13,15 +14,13 @@ import org.jameshpark.banksy.models.GoogleSheetsSink
 import org.jameshpark.banksy.transformer.DefaultTransformer
 import org.jameshpark.banksy.utils.csvFeedsFromProperties
 import org.jameshpark.banksy.utils.launchApp
-import org.jameshpark.banksy.utils.loadProperties
 import org.jameshpark.banksy.utils.sheetsServiceFromProperties
 
 private val logger = KotlinLogging.logger { }
 
 fun main() = launchApp {
-    val properties = loadProperties()
-
-    val dao = Dao.fromProperties(properties)
+    val db = DefaultDatabase.fromProperties(properties).register()
+    val dao = Dao(db)
 
     val extractor = CsvExtractor(dao)
     val transformer = DefaultTransformer()

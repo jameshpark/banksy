@@ -9,12 +9,14 @@ import liquibase.Contexts
 import liquibase.Liquibase
 import liquibase.database.jvm.JdbcConnection
 import liquibase.resource.ClassLoaderResourceAccessor
+import org.jameshpark.banksy.utils.require
 import java.math.BigDecimal
 import java.sql.*
 import java.time.LocalDate
+import java.util.Properties
 import javax.lang.model.type.NullType
 
-class DefaultDatabase(private val conn: Connection) : Database {
+class DefaultDatabase(private val conn: Connection) : Database, AutoCloseable {
 
     override suspend fun execute(sql: String, params: List<Any?>): Int {
         return prepareStatement(sql, params).use {
@@ -45,6 +47,10 @@ class DefaultDatabase(private val conn: Connection) : Database {
                 emit(result)
             }
         }
+    }
+
+    override fun close() {
+        conn.close()
     }
 
     private fun prepareStatement(sql: String, params: List<Any?>) = conn.prepareStatement(sql).apply {
@@ -79,7 +85,8 @@ class DefaultDatabase(private val conn: Connection) : Database {
 
         private val logger = KotlinLogging.logger { }
 
-        fun fromUrl(url: String): DefaultDatabase {
+        fun fromProperties(properties: Properties): DefaultDatabase {
+            val url = properties.require("app.database.url")
             val conn = DriverManager.getConnection(url)
             logger.info { "Connected to database" }
 

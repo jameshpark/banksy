@@ -5,10 +5,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import org.jameshpark.banksy.models.Category
 import org.jameshpark.banksy.models.Transaction
 import org.jameshpark.banksy.models.TransactionType
-import org.jameshpark.banksy.utils.require
 import java.time.Instant
 import java.time.LocalDate
-import java.util.*
 
 class Dao(private val db: Database) {
 
@@ -75,13 +73,6 @@ class Dao(private val db: Database) {
                 originHash = getString("originHash")
             )
         }
-
     }
 
-    companion object {
-        fun fromProperties(properties: Properties): Dao {
-            val db = DefaultDatabase.fromUrl(properties.require("app.database.url"))
-            return Dao(db)
-        }
-    }
 }
