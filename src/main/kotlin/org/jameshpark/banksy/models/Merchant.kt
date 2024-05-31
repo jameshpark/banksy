@@ -20,8 +20,8 @@ data class Merchant(
 
 val merchants by lazy {
     val mapper = jacksonObjectMapper()
-    val defaultMerchants: List<Merchant> = mapper.readValue(getResourceAsStream("merchants.json"))
-    val localMerchants: List<Merchant>? = getFileAsStream("local.merchants.json")?.let { mapper.readValue(it) }
+    val defaultMerchants: List<Merchant> = getResourceAsStream("merchants.json").use { mapper.readValue(it) }
+    val localMerchants: List<Merchant>? = getFileAsStream("local.merchants.json")?.use { mapper.readValue(it) }
 
     localMerchants?.let {
         (defaultMerchants + it).associateBy { merchant -> merchant.name }.values.toList()
