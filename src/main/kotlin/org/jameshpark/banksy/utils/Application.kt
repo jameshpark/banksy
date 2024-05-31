@@ -9,6 +9,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 private val logger = KotlinLogging.logger { }
 
+/**
+ * Launches the application by executing the provided [block] in a suspended manner.
+ * This method sets up the application coroutine and manages its lifecycle.
+ *
+ * @param block The suspendable function that defines the behavior of the application.
+ *              It is executed within the context of the [ApplicationScope].
+ */
 fun launchApp(block: suspend ApplicationScope.() -> Unit) = try {
     runBlocking {
         val applicationJob = launch(Dispatchers.Default + CoroutineName("application-coroutine")) {
@@ -50,6 +57,13 @@ fun launchApp(block: suspend ApplicationScope.() -> Unit) = try {
     // Swallow this and just let the application coroutine scope cancel as normal.
 }
 
+/**
+ * Launches the application by executing the provided [block] in a suspended manner.
+ * This method sets up the application coroutine and manages its lifecycle.
+ *
+ * @param block The suspendable function that defines the behavior of the application.
+ *              It is executed within the context of the [ApplicationScope].
+ */
 suspend fun applicationScope(block: suspend ApplicationScope.() -> Unit) {
     val registry = ThunkRegistry()
     try {
@@ -61,6 +75,14 @@ suspend fun applicationScope(block: suspend ApplicationScope.() -> Unit) {
     }
 }
 
+/**
+ * ApplicationScope class represents the scope in which the application runs.
+ * It extends CoroutineScope, which allows it to launch and manage coroutines.
+ *
+ * @property registry The ThunkRegistry instance used to register resources.
+ * @property properties The Properties instance containing application-specific properties.
+ * @param scope The CoroutineScope instance that will be delegated to by this ApplicationScope.
+ */
 class ApplicationScope(
     private val registry: ThunkRegistry,
     val properties: Properties,
@@ -72,6 +94,10 @@ class ApplicationScope(
     }
 }
 
+/**
+ * ThunkRegistry is a class that manages the registration and cleanup of resources.
+ * It provides a way to register resources and perform cleanup in a suspended manner.
+ */
 class ThunkRegistry {
     private val registry = ConcurrentLinkedDeque<Thunk>()
     private val isRunning = AtomicBoolean(true)
