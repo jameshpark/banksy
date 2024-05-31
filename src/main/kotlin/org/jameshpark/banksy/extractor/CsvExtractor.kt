@@ -24,8 +24,10 @@ class CsvExtractor(
         val bookmarkName = feed.getBookmarkName()
         val previousBookmark = dao.getLatestBookmarkByName(bookmarkName) ?: LocalDate.EPOCH
         val rowsSincePreviousBookmark = filterRowsSinceBookmark(previousBookmark, rows)
-        logger.info { "Saving new $bookmarkName bookmark $newBookmark" }
-        dao.saveBookmark(bookmarkName, newBookmark)
+        if (newBookmark > previousBookmark) {
+            logger.info { "Saving new $bookmarkName bookmark $newBookmark" }
+            dao.saveBookmark(bookmarkName, newBookmark)
+        }
         return rowsSincePreviousBookmark
     }
 
@@ -36,7 +38,7 @@ class CsvExtractor(
             reader.readAllWithHeader(file)
         }
         val bookmark = getTransactionDate(rows.maxBy { getTransactionDate(it) })
-        logger.info { "Found new bookmark $bookmark in ${file.name}" }
+        logger.info { "Found bookmark $bookmark in ${file.name}" }
         return rows.asFlow() to bookmark
     }
 
