@@ -22,13 +22,6 @@ fun main() = launchApp {
     val db = DefaultDatabase.fromProperties(properties).register()
     val dao = Dao(db)
 
-    val extractor = CsvExtractor(dao)
-    val transformer = DefaultTransformer()
-    val loader = DefaultLoader(dao)
-
-    val csvExporter = CsvExporter(dao)
-    val googleSheetsExporter = GoogleSheetsExporter(dao, sheetsServiceFromProperties(properties))
-
     val csvFeeds = csvFeedsFromProperties(properties).also {
         if (it.isEmpty()) {
             logger.info { "No transaction csv files found. Quitting..." }
@@ -37,6 +30,10 @@ fun main() = launchApp {
     }
 
     val transactionIdBeforeLoad = dao.getLatestTransactionId()
+
+    val extractor = CsvExtractor(dao)
+    val transformer = DefaultTransformer()
+    val loader = DefaultLoader(dao)
 
     coroutineScope {
         csvFeeds.map { feed ->
@@ -47,6 +44,9 @@ fun main() = launchApp {
             }
         }
     }
+
+    val csvExporter = CsvExporter(dao)
+    val googleSheetsExporter = GoogleSheetsExporter(dao, sheetsServiceFromProperties(properties))
 
     coroutineScope {
         launch {
