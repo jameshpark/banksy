@@ -102,6 +102,9 @@ class DefaultDatabase(private val conn: Connection) : Database, AutoCloseable {
                 JdbcConnection(conn)
             )
             liquibase.update(Contexts())
+
+            // db migrations turn autocommit off so make sure to turn it back on
+            conn.autoCommit = true
         }
 
     }
