@@ -19,8 +19,12 @@ class GoogleSheetsExporter(
         val sheetName = sink.sheetName
         val transactionRows = dao.getTransactionsNewerThanId(sinceId).map { it.toCsvRow() }.toList()
 
-        sheetsService.appendRows(spreadsheetId, sheetName, transactionRows)
-        logger.info { "Appended ${transactionRows.size} rows to ${sink.spreadsheetName}.$sheetName" }
+        if (transactionRows.isEmpty()) {
+            logger.info { "No new transactions to append to Google Sheet." }
+        } else {
+            sheetsService.appendRows(spreadsheetId, sheetName, transactionRows)
+            logger.info { "Appended ${transactionRows.size} rows to ${sink.spreadsheetName}.$sheetName" }
+        }
     }
 
     companion object {

@@ -99,7 +99,10 @@ class Banksy : CliktCommand() {
         transactionIdBeforeLoad: Int
     ) {
         coroutineScope.launch {
-            GoogleSheetsExporter(dao, sheetsServiceFromProperties(applicationScope.properties)).export(
+            GoogleSheetsExporter(
+                dao,
+                sheetsServiceFromProperties(applicationScope.properties)
+            ).export(
                 GoogleSheetsSink.fromProperties(applicationScope.properties),
                 transactionIdBeforeLoad
             )
