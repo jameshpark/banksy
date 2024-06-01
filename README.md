@@ -49,7 +49,25 @@ This is a [Kotlin](https://kotlinlang.org/docs/home.html) project
        ```
     3. Add your own merchants to `local.merchants.json` to make Banksy useful for you
        ```shell
-       TODO
+       [
+          ...
+         {
+           "name": "American Airlines",
+           "category": "VACATION",
+           "regex": "american\\s?air?l?i?n?e?s?"
+         },
+         {
+           "name": "Whole Foods",
+           "category": "GROCERIES",
+           "regex": "whole\\s?fo?o?ds?"
+         },
+         {
+           "name": "some merchant you transacted with",
+           "category": "a category defined in models/Category.kt (add more as you need)",
+           "regex": "regular expression to identify these transactions"
+         },
+         ...
+       ]
        ```
    
 2. Build the project
