@@ -30,7 +30,6 @@ class Banksy : CliktCommand() {
         .help("Set true to export results to Google Sheets. Default: false")
 
     override fun run() = launchApp {
-        logger.info { "exportToGoogleSheet: $exportToGoogleSheet" }
         val db = DefaultDatabase.fromProperties(properties).register()
         val dao = Dao(db)
         val csvFeeds = csvFeedsFromProperties(properties).also {
