@@ -19,7 +19,7 @@ While you _can_ install the standalone compiler, I'd recommend installing Intell
 ### Prerequisites
 * [JDK 17](https://adoptium.net/temurin/archive/?version=17)
 * [Maven](https://maven.apache.org/)
-* IntelliJ IDEA (includes Kotlin language compiler)
+* [IntelliJ IDEA](https://www.jetbrains.com/idea/) (includes Kotlin language compiler)
 
 ### macOS Setup
 1. Install the JDK. I recommend using a version manager (I like [asdf](https://asdf-vm.com/)).
@@ -87,8 +87,8 @@ While you _can_ install the standalone compiler, I'd recommend installing Intell
    ```
    1. You can also just click the green arrow next to `fun main()` in IntelliJ IDEA
 
-Once built, Banksy can be run simply by calling
-```
+**NOTE**: once the project is built, you can run Banksy simply by calling
+```shell
 ./banksy [--export-to-google-sheets=true/false, --help]
 ```
 This is a convenient way to run Banksy when processing transactions and not actively developing/modifying the code.
