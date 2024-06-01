@@ -4,7 +4,7 @@ It ingests transactions from CSV files in the [transactions-import](transactions
 normalizes the transactions into a single common schema, categorizes the transactions based on their descriptions,
 and persists them in a local SQLite database.
 
-Banksy can then export the transactions as a CSV file to the [transactions-export](transactions-export) directory or 
+Banksy can then export the transactions as a CSV file to the [transactions-export](transactions-export) directory and optionally
 upload them directly to a specified Google Sheet.
 
 ## Getting Started
@@ -46,7 +46,7 @@ While you _can_ install the standalone compiler, I'd recommend installing Intell
        cp local.properties.sample local.properties
        cp local.merchants.json.sample local.merchants.json
        ```
-    2. Specify values for these keys in `local.properties`
+    2. Specify values for these keys in `local.properties` if you want to export results to a Google Sheet
        ```shell
        google.client.secret.json=
        google.sheets.spreadsheet-id=
@@ -85,10 +85,17 @@ While you _can_ install the standalone compiler, I'd recommend installing Intell
    ```shell
    mvn exec:java
    ```
+   1. You can also just click the green arrow next to `fun main()` in IntelliJ IDEA
+
+Once built, Banksy can be run simply by calling
+```
+./banksy [--export-to-google-sheets=true/false, --help]
+```
+This is a convenient way to run Banksy when processing transactions and not actively developing/modifying the code.
 
 ### Steps to Process Transaction Data
 1. Obtain your transaction data in CSV file(s).
 2. Place your CSV file(s) in the [transactions-import](transactions-import) directory.
 3. Add [Mapper](src/main/kotlin/org/jameshpark/banksy/transformer/Mapper.kt) instances to `enum class Mapper` and entries to the `headersToMappers` map as needed.
 4. Run Banksy
-5. Processed results will be saved to the [transactions-export](transactions-export) directory and your Google Sheet.
+5. Processed results will be saved to the [transactions-export](transactions-export) directory (and your Google Sheet if values are specified in `local.properties`).
