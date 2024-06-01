@@ -8,12 +8,18 @@ Banksy can then export the transactions as a CSV file to the [transactions-expor
 upload them directly to a specified Google Sheet.
 
 ## Getting Started
-This is a [Kotlin](https://kotlinlang.org/docs/home.html) project 
+This is a [Kotlin](https://kotlinlang.org/docs/home.html) project and, as such, you'll need a modern version of a Kotlin compiler.
+While you _can_ install the standalone compiler, I'd recommend installing IntelliJ IDEA instead for a few reasons:
+1. IntelliJ IDEA supports Kotlin out of the box (installs and keeps up-to-date the Kotlin compiler)
+2. Both IDEA and Kotlin are created/maintained by JetBrains
+3. IDEA has the best support for Kotlin (intellisense, autosuggestions, project awareness) and it _will_ save you from shooting yourself in the foot
+   1. In fact, IDEA may be the _only_ IDE/editor with reliable suggestions
+4. There is no officially supported LSP for Kotlin, and the available unofficial LSPs are all incomplete AFAIK
 
 ### Prerequisites
 * [JDK 17](https://adoptium.net/temurin/archive/?version=17)
 * [Maven](https://maven.apache.org/)
-* IntelliJ IDEA (for programming Kotlin)
+* IntelliJ IDEA (includes Kotlin language compiler)
 
 ### macOS Setup
 1. Install the JDK. I recommend using a version manager (I like [asdf](https://asdf-vm.com/)).
@@ -32,7 +38,7 @@ This is a [Kotlin](https://kotlinlang.org/docs/home.html) project
     1. ```shell
        brew install --cask jetbrains-toolbox
        ```
-    2. Install IntelliJ IDEA (Community or Ultimate) through Jetbrains Toolbox
+    2. Install IntelliJ IDEA (Community or Ultimate) through JetBrains Toolbox
 
 ### Local Development Setup
 1. Copy `*.sample` files and add your own configs/secrets
