@@ -52,7 +52,7 @@ class Banksy : CliktCommand() {
     }
 
     /**
-     * Processes a list of CSV feeds asynchronously.
+     * Processes a list of CSV feeds concurrently.
      *
      * Data from each CSV feed is extracted, filtered, transformed, and then loaded into a local database.
      *
