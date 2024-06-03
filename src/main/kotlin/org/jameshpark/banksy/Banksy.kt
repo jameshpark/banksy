@@ -16,11 +16,11 @@ import org.jameshpark.banksy.exporter.GoogleSheetsExporter
 import org.jameshpark.banksy.extractor.CsvExtractor
 import org.jameshpark.banksy.extractor.TellerExtractor
 import org.jameshpark.banksy.loader.DefaultLoader
-import org.jameshpark.banksy.loader.Loader
+import org.jameshpark.banksy.models.CsvFeed
 import org.jameshpark.banksy.models.CsvSink
 import org.jameshpark.banksy.models.GoogleSheetsSink
+import org.jameshpark.banksy.models.TellerFeed
 import org.jameshpark.banksy.transformer.DefaultTransformer
-import org.jameshpark.banksy.transformer.Transformer
 import org.jameshpark.banksy.utils.*
 import java.io.FileNotFoundException
 
@@ -41,11 +41,7 @@ class Banksy : CliktCommand() {
         val db = DefaultDatabase.fromProperties(properties).register()
         val dao = Dao(db)
 
-        val transformer: Transformer
-        val loader: Loader
-        val transactionIdBeforeLoad: Int
-
-        when (extractionSource) {
+        val (extractor, feeds) = when (extractionSource) {
             ExtractionSource.CSV -> {
                 val extractor = CsvExtractor(dao)
                 val feeds = csvFeedsFromProperties(properties).also {
@@ -54,18 +50,7 @@ class Banksy : CliktCommand() {
                         return@launchApp
                     }
                 }
-                transformer = DefaultTransformer()
-                loader = DefaultLoader(dao)
-                transactionIdBeforeLoad = dao.getLatestTransactionId()
-                coroutineScope {
-                    feeds.map { feed ->
-                        launch {
-                            val rows = extractor.extract(feed)
-                            val transactions = transformer.transform(rows, feed.file.name)
-                            loader.saveTransactions(feed, transactions)
-                        }
-                    }
-                }
+                extractor to feeds
             }
 
             ExtractionSource.TELLER -> {
@@ -79,30 +64,50 @@ class Banksy : CliktCommand() {
                     logger.error(e) { "Failed to load Teller feeds from json. Quitting..." }
                     return@launchApp
                 }
-                transformer = DefaultTransformer()
-                loader = DefaultLoader(dao)
-                transactionIdBeforeLoad = dao.getLatestTransactionId()
-                coroutineScope {
-                    feeds.map { feed ->
-                        launch {
-                            val rows = extractor.extract(feed)
-                            val transactions = transformer.transform(rows, feed.feedName.name)
-                            loader.saveTransactions(feed, transactions)
+                extractor to feeds
+            }
+        }
+
+        val transformer = DefaultTransformer()
+        val loader = DefaultLoader(dao)
+        val transactionIdBeforeLoad = dao.getLatestTransactionId()
+
+        coroutineScope {
+            feeds.map { feed ->
+                launch {
+                    val (rows, sourceName) = when (extractor) {
+                        is CsvExtractor -> {
+                            (feed as CsvFeed).let {
+                                extractor.extract(it) to it.file.name
+                            }
+                        }
+
+                        is TellerExtractor -> {
+                            (feed as TellerFeed).let {
+                                extractor.extract(it) to it.feedName.name
+                            }
+                        }
+
+                        else -> {
+                            TODO()
                         }
                     }
+                    val transactions = transformer.transform(rows, sourceName)
+                    loader.saveTransactions(feed, transactions)
                 }
             }
         }
 
         when (exportDestination) {
             ExportDestination.CSV -> {
-                val exporter = CsvExporter(dao)
-                exporter.export(CsvSink.fromProperties(properties), transactionIdBeforeLoad)
+                CsvExporter(dao).export(CsvSink.fromProperties(properties), transactionIdBeforeLoad)
             }
 
             ExportDestination.GOOGLE_SHEET -> {
-                val exporter = GoogleSheetsExporter(dao, sheetsServiceFromProperties(properties))
-                exporter.export(GoogleSheetsSink.fromProperties(properties), transactionIdBeforeLoad)
+                GoogleSheetsExporter(
+                    dao,
+                    sheetsServiceFromProperties(properties)
+                ).export(GoogleSheetsSink.fromProperties(properties), transactionIdBeforeLoad)
             }
         }
     }
