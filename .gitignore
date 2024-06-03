@@ -45,3 +45,4 @@ transactions-extracted/**
 local.properties
 local.merchants.json
 tokens/
+**/**.pem
