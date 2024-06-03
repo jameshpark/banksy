@@ -4,7 +4,7 @@ import org.jameshpark.banksy.utils.require
 import java.util.*
 
 
-class GoogleSheetsSink(
+data class GoogleSheetsSink(
     val spreadsheetId: String,
     val spreadsheetName: String,
     val sheetName: String

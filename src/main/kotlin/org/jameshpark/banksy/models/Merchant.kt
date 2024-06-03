@@ -1,8 +1,10 @@
 package org.jameshpark.banksy.models
 
-import com.fasterxml.jackson.module.kotlin.jacksonObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import kotlinx.coroutines.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import org.jameshpark.banksy.utils.OBJECT_MAPPER
 import org.jameshpark.banksy.utils.getFileAsStream
 import org.jameshpark.banksy.utils.getResourceAsStream
 
@@ -19,9 +21,8 @@ data class Merchant(
 }
 
 val merchants by lazy {
-    val mapper = jacksonObjectMapper()
-    val defaultMerchants: List<Merchant> = getResourceAsStream("merchants.json").use { mapper.readValue(it) }
-    val localMerchants: List<Merchant>? = getFileAsStream("local.merchants.json")?.use { mapper.readValue(it) }
+    val defaultMerchants: List<Merchant> = getResourceAsStream("merchants.json").use { OBJECT_MAPPER.readValue(it) }
+    val localMerchants: List<Merchant>? = getFileAsStream("local.merchants.json")?.use { OBJECT_MAPPER.readValue(it) }
 
     localMerchants?.let {
         (defaultMerchants + it).associateBy { merchant -> merchant.name }.values.toList()

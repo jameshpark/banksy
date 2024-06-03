@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.io.path.pathString
 
-class CsvSink(val filePath: String, val includeHeader: Boolean = false) : Sink {
+data class CsvSink(val filePath: String, val includeHeader: Boolean = false) : Sink {
     companion object {
 
         fun fromProperties(properties: Properties): CsvSink {

@@ -7,9 +7,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.jameshpark.banksy.database.Dao
+import org.jameshpark.banksy.models.CsvExtracted
 import org.jameshpark.banksy.models.CsvFeed
+import org.jameshpark.banksy.models.Extracted
 import org.jameshpark.banksy.transformer.headersToMapper
 import java.io.File
 import java.time.LocalDate
@@ -19,27 +22,20 @@ class CsvExtractor(
     private val reader: CsvReader = csvReader()
 ) : Extractor<CsvFeed> {
 
-    override suspend fun extract(feed: CsvFeed): Flow<Map<String, String>> {
-        val (rows, newBookmark) = readCsvRows(feed.file)
+    override suspend fun extract(feed: CsvFeed): Flow<Extracted> {
+        val rows = readCsvRows(feed.file)
         val bookmarkName = feed.getBookmarkName()
         val previousBookmark = dao.getLatestBookmarkByName(bookmarkName) ?: LocalDate.EPOCH
         val rowsSincePreviousBookmark = filterRowsSinceBookmark(previousBookmark, rows)
-        if (newBookmark > previousBookmark) {
-            logger.info { "Saving new $bookmarkName bookmark $newBookmark" }
-            dao.saveBookmark(bookmarkName, newBookmark)
-        }
-        return rowsSincePreviousBookmark
+        return rowsSincePreviousBookmark.map { CsvExtracted(it) }
     }
 
-    private suspend fun readCsvRows(file: File): Pair<Flow<Map<String, String>>, LocalDate> {
+    private suspend fun readCsvRows(file: File): Flow<Map<String, String>> {
         require(file.isFile && file.extension.lowercase() == "csv") { "${file.name} is not a csv file" }
 
-        val rows = withContext(Dispatchers.IO) {
+        return withContext(Dispatchers.IO) {
             reader.readAllWithHeader(file)
-        }
-        val bookmark = getTransactionDate(rows.maxBy { getTransactionDate(it) })
-        logger.info { "Found bookmark $bookmark in ${file.name}" }
-        return rows.asFlow() to bookmark
+        }.asFlow()
     }
 
     private fun getTransactionDate(row: Map<String, String>): LocalDate {

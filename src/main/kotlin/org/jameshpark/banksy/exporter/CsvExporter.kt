@@ -23,7 +23,7 @@ class CsvExporter(
 
         var output: File? = null
         var csvFileWriter: CsvFileWriter? = null
-        var counter: AtomicInteger? = null
+        var counter = AtomicInteger(0)
 
         try {
             transactions.collect { transaction ->
