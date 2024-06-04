@@ -7,3 +7,7 @@ google.client.secret.json=
 google.sheets.spreadsheet-id=
 google.sheets.spreadsheet-name=
 google.sheets.sheet-name=
+
+teller.client.certificate.path=
+teller.client.private-key.path=
+teller.feeds.json.path=
