@@ -54,7 +54,8 @@ class Banksy : CliktCommand() {
             }
 
             ExtractionSource.TELLER -> {
-                val extractor = TellerExtractor(dao, TellerClient.fromProperties(properties))
+                val tellerClient = TellerClient.fromProperties(properties).register()
+                val extractor = TellerExtractor(dao, tellerClient)
                 val feeds = try {
                     tellerFeedsFromJson(properties.require("teller.feeds.json.path"))
                 } catch (e: FileNotFoundException) {

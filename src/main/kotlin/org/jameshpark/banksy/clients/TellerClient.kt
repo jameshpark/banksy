@@ -22,7 +22,11 @@ import java.time.LocalDate
 import java.util.*
 
 
-class TellerClient(private val httpClient: HttpClient) {
+class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
+
+    override fun close() {
+        httpClient.close()
+    }
 
     // teller returns transactions in DESC order (i.e. newest to oldest)
     // a bookmark aka transaction id in the request returns a response
@@ -83,7 +87,7 @@ class TellerClient(private val httpClient: HttpClient) {
             return TellerClient(httpClient)
         }
 
-        fun createHttpClient(certificatePath: String, privateKeyPath: String): HttpClient {
+        private fun createHttpClient(certificatePath: String, privateKeyPath: String): HttpClient {
             val keyManager = PemUtils.loadIdentityMaterial(certificatePath, privateKeyPath)
 //            val keyManager = PemUtils.loadIdentityMaterial(
 //                FileInputStream("secrets/certificate.pem"),
@@ -111,5 +115,7 @@ class TellerClient(private val httpClient: HttpClient) {
                 }
             }
         }
+
     }
+
 }
