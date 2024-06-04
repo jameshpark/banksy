@@ -18,7 +18,7 @@ class TellerExtractor(
         val bookmarkName = feed.getBookmarkName()
         val previousBookmark = dao.getLatestBookmarkByName(bookmarkName) ?: LocalDate.EPOCH
         val tellerTransactions = tellerClient.getTransactions(feed.accountId, feed.accessToken, previousBookmark)
-        return tellerTransactions.map { TellerExtracted(it) }
+        return tellerTransactions.map { TellerExtracted(it, feed.feedName) }
     }
 
     companion object {

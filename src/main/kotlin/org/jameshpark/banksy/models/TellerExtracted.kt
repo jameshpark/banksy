@@ -1,13 +1,20 @@
 package org.jameshpark.banksy.models
 
-data class TellerExtracted(private val tellerTransaction: TellerTransaction) : Extracted {
+data class TellerExtracted(
+    private val tellerTransaction: TellerTransaction,
+    private val sourceFeed: FeedName
+) :
+    Extracted {
     override suspend fun toTransaction() = with(tellerTransaction) {
         Transaction(
             date = date,
             description = description,
-            amount = amount,
+            amount = amount.abs(),
             category = categoryFrom(description),
-            type = if (amount < 0.toBigDecimal()) TransactionType.DEBIT else TransactionType.CREDIT,
+            type = when (sourceFeed) {
+                FeedName.CHASE_CHECKING -> if (amount < 0.toBigDecimal()) TransactionType.DEBIT else TransactionType.CREDIT
+                else -> if (amount < 0.toBigDecimal()) TransactionType.CREDIT else TransactionType.DEBIT
+            },
             originHash = hash()
         )
     }
