@@ -108,7 +108,7 @@ fun sheetsServiceFromSecretJson(secretJson: String): Sheets {
     }
 }
 
-private suspend fun Sheets.getSheetId(spreadsheetId: String, sheetName: String): Int? {
+private suspend fun Sheets.getSheetId(spreadsheetId: String, sheetName: String): Int {
     val spreadsheet = withContext(Dispatchers.IO) {
         spreadsheets().get(spreadsheetId).execute()
     }

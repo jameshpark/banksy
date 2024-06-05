@@ -1,6 +1,5 @@
 package org.jameshpark.banksy.extractor
 
-import io.github.oshai.kotlinlogging.KotlinLogging
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.jameshpark.banksy.clients.TellerClient
@@ -19,9 +18,5 @@ class TellerExtractor(
         val previousBookmark = dao.getLatestBookmarkByName(bookmarkName) ?: LocalDate.EPOCH
         val tellerTransactions = tellerClient.getTransactions(feed.accountId, feed.accessToken, previousBookmark)
         return tellerTransactions.map { TellerExtracted(it, feed.feedName) }
-    }
-
-    companion object {
-        private val logger = KotlinLogging.logger { }
     }
 }

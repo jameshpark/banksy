@@ -2,7 +2,6 @@ package org.jameshpark.banksy.clients
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.okhttp.*
@@ -76,8 +75,6 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
     companion object {
 
         private const val NO_PASSWORD = ""
-
-        private val logger = KotlinLogging.logger { }
 
         fun fromProperties(properties: Properties): TellerClient {
             val httpClient = createHttpClient(
