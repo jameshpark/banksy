@@ -2,6 +2,7 @@ package org.jameshpark.banksy
 
 import com.fasterxml.jackson.databind.JsonMappingException
 import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
@@ -11,6 +12,7 @@ import kotlinx.coroutines.launch
 import org.jameshpark.banksy.clients.TellerClient
 import org.jameshpark.banksy.database.Dao
 import org.jameshpark.banksy.database.DefaultDatabase
+import org.jameshpark.banksy.database.NoOpDatabase
 import org.jameshpark.banksy.exporter.CsvExporter
 import org.jameshpark.banksy.exporter.GoogleSheetsExporter
 import org.jameshpark.banksy.extractor.CsvExtractor
@@ -36,6 +38,7 @@ enum class ExportDestination {
 class Banksy : CliktCommand() {
     private val extractionSource by option("--extract-from").enum<ExtractionSource>().required()
     private val exportDestination by option("--export-to").enum<ExportDestination>().required()
+    private val dryRun by option("--dry-run").flag()
 
     override fun run() = launchApp {
         val db = DefaultDatabase.fromProperties(properties).register()
@@ -70,7 +73,12 @@ class Banksy : CliktCommand() {
         }
 
         val transformer = DefaultTransformer()
-        val loader = DefaultLoader(dao)
+        val loader = if (!dryRun) {
+            DefaultLoader(dao)
+        } else {
+            logger.info { "This is a Dry Run. Nothing will be written or exported." }
+            DefaultLoader(Dao(NoOpDatabase()))
+        }
         val transactionIdBeforeLoad = dao.getLatestTransactionId()
 
         coroutineScope {
