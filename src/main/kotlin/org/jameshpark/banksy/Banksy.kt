@@ -96,10 +96,6 @@ class Banksy : CliktCommand() {
                                 extractor.extract(it) to it.feedName.name
                             }
                         }
-
-                        else -> {
-                            TODO()
-                        }
                     }
                     val transactions = transformer.transform(rows, sourceName)
                     loader.saveTransactions(feed, transactions)
