@@ -22,7 +22,7 @@ class GoogleSheetsExporter(
         if (transactionRows.isEmpty()) {
             logger.info { "No new transactions to append to Google Sheet." }
         } else {
-            sheetsService.appendRows(spreadsheetId, sheetName, transactionRows)
+            sheetsService.appendRows(spreadsheetId, sheetName, transactionRows, startRow = 1)
             logger.info { "Appended ${transactionRows.size} rows to ${sink.spreadsheetName}.$sheetName" }
         }
     }
