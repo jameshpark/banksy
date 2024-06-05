@@ -36,11 +36,11 @@ class CsvExporter(
                 }
 
                 if (counter!!.incrementAndGet() % 10 == 0) {
-                    logger.info { "Exported ${counter!!.get()} transactions to $filePath" }
+                    logger.info { "Exported ${counter.get()} transactions to $filePath" }
                 }
             }
 
-            logger.info { "Exported ${counter!!.get()} transactions to $filePath" }
+            logger.info { "Exported ${counter.get()} transactions to $filePath" }
         } finally {
             csvFileWriter?.close()
         }
