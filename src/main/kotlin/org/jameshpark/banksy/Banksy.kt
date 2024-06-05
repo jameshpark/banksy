@@ -77,7 +77,7 @@ class Banksy : CliktCommand() {
             DefaultLoader(dao)
         } else {
             logger.info { "This is a Dry Run. Nothing will be written or exported." }
-            DefaultLoader(Dao(NoOpDatabase()))
+            DefaultLoader(Dao(NoOpDatabase(verbose = true)))
         }
         val transactionIdBeforeLoad = dao.getLatestTransactionId()
 
