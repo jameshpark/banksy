@@ -50,12 +50,13 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
         var fromId = pageStartId
         do {
             val page = nextPage(accessToken, accountId, pageSize, fromId)
-            val filtered = page.takeWhile { it.status == Status.POSTED && it.date > bookmark }
+            val posted = page.filter { it.status == Status.POSTED }
+            val filtered = posted.filter { it.date > bookmark }
 
-            fromId = filtered.lastOrNull()?.id
+            fromId = page.lastOrNull()?.id
 
             filtered.forEach { emit(it) }
-        } while (filtered.size >= pageSize)
+        } while (posted.all { it.date > bookmark })
     }
 
     private suspend fun nextPage(
@@ -64,10 +65,10 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
         pageSize: Int,
         fromId: String?
     ) = httpClient.get {
-        url.path("accounts", accountId, "transactions")
-        parameters {
-            append("count", pageSize.toString())
-            fromId?.let { append("from_id", it) }
+        url {
+            path("accounts", accountId, "transactions")
+            parameters.append("count", pageSize.toString())
+            fromId?.let { parameters.append("from_id", it) }
         }
         basicAuth(accessToken, NO_PASSWORD)
     }.body<List<TellerTransaction>>()
