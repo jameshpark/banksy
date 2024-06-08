@@ -44,7 +44,7 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
         accountId: String,
         accessToken: String,
         bookmark: LocalDate,
-        pageSize: Int = 50,
+        pageSize: Int = 100,
         pageStartId: String? = null
     ): Flow<TellerTransaction> = flow {
         var fromId = pageStartId
