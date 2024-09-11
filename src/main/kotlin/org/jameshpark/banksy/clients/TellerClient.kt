@@ -40,7 +40,7 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
      * 3. if all transactions' dates > bookmark, get the next page
      * 4. repeat
      */
-    suspend fun getTransactions(
+    fun getTransactions(
         accountId: String,
         accessToken: String,
         bookmark: LocalDate,
