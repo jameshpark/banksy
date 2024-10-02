@@ -2,6 +2,7 @@ package org.jameshpark.banksy.clients
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import io.github.oshai.kotlinlogging.KotlinLogging
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.engine.okhttp.*
@@ -75,6 +76,8 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
 
     companion object {
 
+        private val logger = KotlinLogging.logger { }
+
         private const val NO_PASSWORD = ""
 
         fun fromProperties(properties: Properties): TellerClient {
@@ -106,6 +109,29 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
                     jackson {
                         disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                         registerModule(JavaTimeModule())
+                    }
+                }
+                HttpResponseValidator {
+                    handleResponseExceptionWithRequest { t, request ->
+                        logger.error(t) { "Error calling ${request.method} ${request.url} ${request.content}" }
+
+//                        when (t) {
+//                            is ClientRequestException -> {
+//                                logger.error { "Error calling ${request.url}: ${t.response.body<String>()}" }
+//                            }
+//                            is ServerResponseException -> {
+//                                logger.error { "Error calling ${request.url}: ${t.response.body<String>()}" }}
+//                            is ResponseException -> {
+//
+//                            }
+//                            is JsonConvertException -> {
+//
+//                            }
+//                            else -> {
+//
+//                            }
+//                        }
+
                     }
                 }
                 defaultRequest {
