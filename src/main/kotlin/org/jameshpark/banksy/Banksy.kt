@@ -7,8 +7,8 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
 import io.github.oshai.kotlinlogging.KotlinLogging
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.supervisorScope
 import org.jameshpark.banksy.clients.TellerClient
 import org.jameshpark.banksy.database.Dao
 import org.jameshpark.banksy.database.DefaultDatabase
@@ -23,7 +23,11 @@ import org.jameshpark.banksy.models.CsvSink
 import org.jameshpark.banksy.models.GoogleSheetsSink
 import org.jameshpark.banksy.models.TellerFeed
 import org.jameshpark.banksy.transformer.DefaultTransformer
-import org.jameshpark.banksy.utils.*
+import org.jameshpark.banksy.utils.csvFeedsFromProperties
+import org.jameshpark.banksy.utils.launchApp
+import org.jameshpark.banksy.utils.require
+import org.jameshpark.banksy.utils.sheetsServiceFromProperties
+import org.jameshpark.banksy.utils.tellerFeedsFromJson
 import java.io.FileNotFoundException
 
 enum class ExtractionSource {
@@ -81,7 +85,7 @@ class Banksy : CliktCommand() {
         }
         val transactionIdBeforeLoad = dao.getLatestTransactionId()
 
-        coroutineScope {
+        supervisorScope {
             feeds.map { feed ->
                 launch {
                     val (rows, sourceName) = when (extractor) {

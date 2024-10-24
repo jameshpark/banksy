@@ -9,6 +9,7 @@ import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.*
 import io.ktor.client.plugins.contentnegotiation.*
 import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
 import kotlinx.coroutines.flow.Flow
@@ -65,14 +66,24 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
         accountId: String,
         pageSize: Int,
         fromId: String?
-    ) = httpClient.get {
-        url {
-            path("accounts", accountId, "transactions")
-            parameters.append("count", pageSize.toString())
-            fromId?.let { parameters.append("from_id", it) }
+    ): List<TellerTransaction> {
+        val response = httpClient.get {
+            url {
+                path("accounts", accountId, "transactions")
+                parameters.append("count", pageSize.toString())
+                fromId?.let { parameters.append("from_id", it) }
+            }
+            basicAuth(accessToken, NO_PASSWORD)
         }
-        basicAuth(accessToken, NO_PASSWORD)
-    }.body<List<TellerTransaction>>()
+
+        return if (response.status.isSuccess()) {
+            response.body<List<TellerTransaction>>()
+        } else {
+            val responseBody = response.bodyAsText()
+            logger.error { "Error getting transactions for accountId=$accountId, accessToken=$accessToken. ${response.status}. Response body: $responseBody" }
+            throw ClientRequestException(response, responseBody)
+        }
+    }
 
     companion object {
 
@@ -109,29 +120,6 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
                     jackson {
                         disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                         registerModule(JavaTimeModule())
-                    }
-                }
-                HttpResponseValidator {
-                    handleResponseExceptionWithRequest { t, request ->
-                        logger.error(t) { "Error calling ${request.method} ${request.url} ${request.content}" }
-
-//                        when (t) {
-//                            is ClientRequestException -> {
-//                                logger.error { "Error calling ${request.url}: ${t.response.body<String>()}" }
-//                            }
-//                            is ServerResponseException -> {
-//                                logger.error { "Error calling ${request.url}: ${t.response.body<String>()}" }}
-//                            is ResponseException -> {
-//
-//                            }
-//                            is JsonConvertException -> {
-//
-//                            }
-//                            else -> {
-//
-//                            }
-//                        }
-
                     }
                 }
                 defaultRequest {
