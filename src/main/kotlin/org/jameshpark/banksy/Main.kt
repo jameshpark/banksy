@@ -1,3 +1,7 @@
 package org.jameshpark.banksy
 
-fun main(args: Array<String>) = Banksy().main(args)
+import com.github.ajalt.clikt.core.subcommands
+
+fun main(args: Array<String>) = Banksy()
+    .subcommands(EtlCommand(), ExportCommand())
+    .main(args)
