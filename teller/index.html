@@ -1,0 +1,54 @@
+<html>
+<head></head>
+<body>
+<!-- When element is clicked, Teller Connect will open -->
+<button id="teller-connect">Connect to your bank</button>
+
+<!-- Body of your page... -->
+
+<!-- Part 1. Include the client library -->
+<script src="https://cdn.teller.io/connect/connect.js"></script>
+<script>
+    const APPLICATION_ID = '';
+    const ENVIRONMENT = 'development';
+    // Part 2. Initialize & configure the client library
+    document.addEventListener("DOMContentLoaded", function () {
+        var tellerConnect = TellerConnect.setup({
+            applicationId: APPLICATION_ID,
+            environment: ENVIRONMENT,
+            onInit: function () {
+                console.log("Teller Connect has initialized");
+            },
+            // Part 3. Handle a successful enrollment's accessToken
+            onSuccess: function (enrollment) {
+                console.log("User enrolled successfully", enrollment);
+
+                // Send the enrollment data to the server
+                fetch("http://localhost:8000/save-enrollment", {
+                    method: "POST",
+                    headers: {"Content-Type": "application/json"},
+                    body: JSON.stringify(enrollment)
+                }).then(response => {
+                    if (response.ok) {
+                        console.log("Enrollment successfully saved to the server!");
+                    } else {
+                        console.error("Failed to save enrollment to the server.");
+                    }
+                }).catch(err => {
+                    console.error("Error sending enrollment to the server:", err);
+                });
+            },
+            onExit: function () {
+                console.log("User closed Teller Connect");
+            }
+        });
+
+        // Part 4. Hook user actions to start Teller Connect
+        var el = document.getElementById("teller-connect");
+        el.addEventListener("click", function () {
+            tellerConnect.open();
+        });
+    });
+</script>
+</body>
+</html>
