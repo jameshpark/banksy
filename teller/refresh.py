@@ -1,17 +1,19 @@
 #!/usr/bin/env python3
 import base64
+import glob
 import json
 import socketserver
 import subprocess
+import threading
 from http.server import SimpleHTTPRequestHandler
 
 PORT = 8000
 
 
-def get_enrollment_data():
+def get_enrollment_data(file_name):
     try:
         # Read enrollment data from enrollment.json
-        with open("enrollment.json", "r") as f:
+        with open(file_name, "r") as f:
             enrollment_data = json.load(f)
             if not enrollment_data.get("accessToken"):
                 raise ValueError("Access token not found in enrollment.json")
@@ -75,7 +77,7 @@ def verify_access_token(access_token):
         return False
 
 
-def serve_index_and_wait_for_post(index_content):
+def serve_index_and_wait_for_post(index_content, enrollment_file):
     class CustomHandler(SimpleHTTPRequestHandler):
         def do_GET(self):
             # Serve index.html content from memory
@@ -94,9 +96,9 @@ def serve_index_and_wait_for_post(index_content):
                 enrollment = json.loads(post_data)
 
                 # Update enrollment.json with new enrollment data
-                with open("enrollment.json", "w") as f:
+                with open(enrollment_file, "w") as f:
                     json.dump(enrollment, f, indent=2)
-                print("Updated enrollment data saved to enrollment.json")
+                print(f"Updated enrollment data saved to {enrollment_file}.")
 
                 # Fetch the updated access token and validate accounts
                 access_token = enrollment.get("accessToken")
@@ -121,7 +123,6 @@ def serve_index_and_wait_for_post(index_content):
                         certfile="../src/main/resources/secrets/certificate.pem",
                         keyfile="../src/main/resources/secrets/private_key.pem"
                     )
-
                     ssl_context.load_default_certs()
 
                     conn = http.client.HTTPSConnection(teller_api_host, context=ssl_context)
@@ -135,9 +136,9 @@ def serve_index_and_wait_for_post(index_content):
 
                     # Update enrollment.json with accounts data
                     enrollment["accounts"] = accounts_data
-                    with open("enrollment.json", "w") as f:
+                    with open(enrollment_file, "w") as f:
                         json.dump(enrollment, f, indent=2)
-                    print("Accounts data added to enrollment.json")
+                    print(f"Accounts data added to {enrollment_file}.")
 
                     # Send success response
                     self.send_response(200)
@@ -151,6 +152,10 @@ def serve_index_and_wait_for_post(index_content):
                 finally:
                     if conn:
                         conn.close()
+                    # Shut down the server after handling the POST
+                    print("Shutting down the server...")
+                    threading.Thread(target=self.server.shutdown).start()
+
                 return
             else:
                 self.send_error(404, "Endpoint not found")
@@ -161,30 +166,42 @@ def serve_index_and_wait_for_post(index_content):
     # Serve the HTML content
     with socketserver.TCPServer(("", PORT), CustomHandler) as server:
         print(f"Serving index.html content on http://localhost:{PORT}/index.html")
-        server.serve_forever()
+        server_thread = threading.Thread(target=server.serve_forever)
+        server_thread.daemon = True
+        server_thread.start()
+        server_thread.join()
 
 
 def main():
-    # Load enrollment data
-    try:
-        enrollment_data = get_enrollment_data()
-        access_token = enrollment_data["accessToken"]
-        enrollment_id = enrollment_data["enrollment"]["id"]
-    except Exception:
-        print("Failed to load enrollment data. Exiting.")
+    enrollment_files = glob.glob("enrollment*.json")
+
+    if not enrollment_files:
+        print("No enrollment JSON files found (enrollment*.json). Exiting.")
         return
 
-    # Step 1: Verify the access token
-    if verify_access_token(access_token):
-        print("No further action required.")
-        return
+    for enrollment_file in enrollment_files:
+        print(f"Refreshing {enrollment_file}...")
 
-    # Step 2: Inject enrollment ID and serve index.html
-    try:
-        index_content = inject_enrollment_id(enrollment_id)
-        serve_index_and_wait_for_post(index_content)
-    except Exception as e:
-        print(f"Error during workflow: {e}")
+        # Load enrollment data
+        try:
+            enrollment_data = get_enrollment_data(enrollment_file)
+            access_token = enrollment_data["accessToken"]
+            enrollment_id = enrollment_data["enrollment"]["id"]
+        except Exception as e:
+            print(f"Failed to load enrollment data from {enrollment_file}: {e}. Moving on to next file.")
+            continue
+
+        # Step 1: Verify the access token
+        if verify_access_token(access_token):
+            print(f"Access token in {enrollment_file} is valid. No further action required.")
+            continue
+
+        # Step 2: Inject enrollment ID and serve index.html
+        try:
+            index_content = inject_enrollment_id(enrollment_id)
+            serve_index_and_wait_for_post(index_content, enrollment_file)
+        except Exception as e:
+            print(f"Error during workflow: {e}")
 
 
 if __name__ == "__main__":
