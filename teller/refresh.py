@@ -2,12 +2,24 @@
 import base64
 import glob
 import json
+import os
+import shutil
 import socketserver
 import subprocess
 import threading
+from datetime import datetime
 from http.server import SimpleHTTPRequestHandler
 
 PORT = 8000
+
+account_to_feed_name = {
+    "American Express Gold Card": "AMEX_GOLD",
+    "Platinum Card\u00ae": "AMEX_PLATINUM",
+    "Sapphire Reserve": "CHASE_SAPPHIRE",
+    "Freedom Unlimited": "CHASE_FREEDOM_UNLIMITED",
+    "Freedom": "CHASE_FREEDOM",
+    "TOTAL CHECKING": "CHASE_CHECKING",
+}
 
 
 def get_enrollment_data(file_name):
@@ -172,12 +184,67 @@ def serve_index_and_wait_for_post(index_content, enrollment_file):
         server_thread.join()
 
 
+def collect_refreshed_accounts(enrollment_file, refreshed_feeds):
+    # Load the current enrollment JSON file
+    with open(enrollment_file, 'r') as f:
+        enrollment_data = json.load(f)
+
+    # Extract the necessary data
+    access_token = enrollment_data.get("accessToken", "")
+    accounts = enrollment_data.get("accounts", [])
+
+    # Structure data in the desired format
+    for account in accounts:
+        refreshed_feeds.append({
+            "feedName": account_to_feed_name[account.get("name")],
+            "accessToken": access_token,
+            "accountId": account.get("id")
+        })
+
+
+def update_teller_feeds_json(output_file_path, backup_file_format, refreshed_feeds):
+    try:
+        # Backup the existing output file if it exists
+        existing_data = []
+        if os.path.exists(output_file_path):
+            # Generate the backup file name with the current date
+            current_date = datetime.now().strftime('%Y-%m-%d')
+            backup_file_path = backup_file_format.format(date=current_date)
+            shutil.copy(output_file_path, backup_file_path)
+            print(f"Backup created: {backup_file_path}")
+
+            # Load the existing teller-feeds.json
+            with open(output_file_path, 'r') as existing_file:
+                existing_data = json.load(existing_file)
+
+        # Merge processed_output with existing_data
+        # Overwrite objects in existing_data with the same feedName in processed_output
+        feed_name_to_feed = {item['feedName']: item for item in existing_data}
+        for new_item in refreshed_feeds:
+            feed_name_to_feed[new_item['feedName']] = new_item
+
+        # Final merged data
+        merged_data = list(feed_name_to_feed.values())
+
+        # Write the merged data to the final JSON file
+        os.makedirs(os.path.dirname(output_file_path), exist_ok=True)
+        with open(output_file_path, 'w') as output_file:
+            json.dump(merged_data, output_file, indent=2)
+
+        print(f"Merged output saved to: {output_file_path}")
+
+    except Exception as e:
+        print(f"An error occurred while writing to {output_file_path}: {e}")
+
+
 def main():
     enrollment_files = glob.glob("enrollment*.json")
 
     if not enrollment_files:
         print("No enrollment JSON files found (enrollment*.json). Exiting.")
         return
+
+    refreshed_feeds = []
 
     for enrollment_file in enrollment_files:
         print(f"Refreshing {enrollment_file}...")
@@ -202,6 +269,25 @@ def main():
             serve_index_and_wait_for_post(index_content, enrollment_file)
         except Exception as e:
             print(f"Error during workflow: {e}")
+
+        # Step 3: collect accounts with refreshed tokens
+        try:
+            collect_refreshed_accounts(enrollment_file, refreshed_feeds)
+
+        except Exception as e:
+            print(f"An error occurred while processing {enrollment_file}: {e}")
+            return
+
+    # Step 4: Update any feeds that were refreshed with new tokens
+    # Path to the output file
+    output_file_path = '../src/main/resources/teller-feeds.json'
+    # Backup file format
+    backup_file_format = '../src/main/resources/teller-feeds_{date}_backup.json'
+
+    try:
+        update_teller_feeds_json(output_file_path, backup_file_format, refreshed_feeds)
+    except Exception as e:
+        print(f"An error occurred while writing to {output_file_path}: {e}")
 
 
 if __name__ == "__main__":
