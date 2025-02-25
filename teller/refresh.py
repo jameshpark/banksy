@@ -278,16 +278,17 @@ def main():
             print(f"An error occurred while processing {enrollment_file}: {e}")
             return
 
-    # Step 4: Update any feeds that were refreshed with new tokens
-    # Path to the output file
-    output_file_path = '../src/main/resources/teller-feeds.json'
-    # Backup file format
-    backup_file_format = '../src/main/resources/teller-feeds_{date}_backup.json'
+    if refreshed_feeds:
+        # Step 4: Update any feeds that were refreshed with new tokens
+        # Path to the output file
+        output_file_path = '../src/main/resources/teller-feeds.json'
+        # Backup file format
+        backup_file_format = '../src/main/resources/teller-feeds_{date}_backup.json'
 
-    try:
-        update_teller_feeds_json(output_file_path, backup_file_format, refreshed_feeds)
-    except Exception as e:
-        print(f"An error occurred while writing to {output_file_path}: {e}")
+        try:
+            update_teller_feeds_json(output_file_path, backup_file_format, refreshed_feeds)
+        except Exception as e:
+            print(f"An error occurred while writing to {output_file_path}: {e}")
 
 
 if __name__ == "__main__":
