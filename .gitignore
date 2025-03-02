@@ -44,5 +44,6 @@ transactions-export/**
 transactions-extracted/**
 local.properties
 local.merchants.json
+teller/enrollment*.json
 tokens/
 **/**.pem
