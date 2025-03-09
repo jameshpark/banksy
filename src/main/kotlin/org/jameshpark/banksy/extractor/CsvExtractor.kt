@@ -3,6 +3,8 @@ package org.jameshpark.banksy.extractor
 import com.github.doyaaaaaken.kotlincsv.client.CsvReader
 import com.github.doyaaaaaken.kotlincsv.dsl.csvReader
 import io.github.oshai.kotlinlogging.KotlinLogging
+import java.io.File
+import java.time.LocalDate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
@@ -14,15 +16,13 @@ import org.jameshpark.banksy.models.CsvExtracted
 import org.jameshpark.banksy.models.CsvFeed
 import org.jameshpark.banksy.models.Extracted
 import org.jameshpark.banksy.transformer.headersToMapper
-import java.io.File
-import java.time.LocalDate
 
 class CsvExtractor(
     private val dao: Dao,
     private val reader: CsvReader = csvReader()
 ) : Extractor<CsvFeed> {
 
-    override suspend fun extract(feed: CsvFeed): Flow<Extracted> {
+    override suspend fun extract(feed: CsvFeed, fromDate: LocalDate?): Flow<Extracted> {
         val rows = readCsvRows(feed.file)
         val bookmarkName = feed.getBookmarkName()
         val previousBookmark = dao.getLatestBookmarkByName(bookmarkName) ?: LocalDate.EPOCH

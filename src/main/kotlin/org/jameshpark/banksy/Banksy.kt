@@ -8,6 +8,8 @@ import com.github.ajalt.clikt.parameters.options.required
 import com.github.ajalt.clikt.parameters.types.enum
 import com.github.ajalt.clikt.parameters.types.int
 import io.github.oshai.kotlinlogging.KotlinLogging
+import java.io.FileNotFoundException
+import java.time.LocalDate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import org.jameshpark.banksy.clients.TellerClient
@@ -29,7 +31,6 @@ import org.jameshpark.banksy.utils.launchApp
 import org.jameshpark.banksy.utils.require
 import org.jameshpark.banksy.utils.sheetsServiceFromProperties
 import org.jameshpark.banksy.utils.tellerFeedsFromJson
-import java.io.FileNotFoundException
 
 enum class ExtractionSource {
     CSV,
@@ -50,6 +51,7 @@ class Banksy : CliktCommand() {
 class EtlCommand : CliktCommand() {
     private val extractionSource by option("--extract-from").enum<ExtractionSource>().required()
     private val exportDestination by option("--export-to").enum<ExportDestination>().required()
+    private val startDate by option("--start-date")
     private val dryRun by option("--dry-run").flag()
 
     override fun run() =
@@ -98,6 +100,7 @@ class EtlCommand : CliktCommand() {
                 }
             val transactionIdBeforeLoad = dao.getLatestTransactionId()
 
+            val fromDate = startDate?.let { LocalDate.parse(it) }
             supervisorScope {
                 feeds.map { feed ->
                     launch {
@@ -105,13 +108,13 @@ class EtlCommand : CliktCommand() {
                             when (extractor) {
                                 is CsvExtractor -> {
                                     (feed as CsvFeed).let {
-                                        extractor.extract(it) to it.file.name
+                                        extractor.extract(it, fromDate) to it.file.name
                                     }
                                 }
 
                                 is TellerExtractor -> {
                                     (feed as TellerFeed).let {
-                                        extractor.extract(it) to it.feedName.name
+                                        extractor.extract(it, fromDate) to it.feedName.name
                                     }
                                 }
                             }
