@@ -3,15 +3,21 @@ package org.jameshpark.banksy.clients
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.github.oshai.kotlinlogging.KotlinLogging
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.engine.okhttp.*
-import io.ktor.client.plugins.*
-import io.ktor.client.plugins.contentnegotiation.*
-import io.ktor.client.request.*
-import io.ktor.client.statement.*
-import io.ktor.http.*
-import io.ktor.serialization.jackson.*
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.ClientRequestException
+import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.defaultRequest
+import io.ktor.client.request.basicAuth
+import io.ktor.client.request.get
+import io.ktor.client.statement.bodyAsText
+import io.ktor.http.isSuccess
+import io.ktor.http.path
+import io.ktor.serialization.jackson.jackson
+import java.time.LocalDate
+import java.util.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import nl.altindag.ssl.SSLFactory
@@ -19,8 +25,6 @@ import nl.altindag.ssl.pem.util.PemUtils
 import org.jameshpark.banksy.models.Status
 import org.jameshpark.banksy.models.TellerTransaction
 import org.jameshpark.banksy.utils.require
-import java.time.LocalDate
-import java.util.*
 
 
 class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
@@ -125,6 +129,12 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
                 defaultRequest {
                     url("https://api.teller.io/")
                 }
+                install(HttpTimeout) {
+                    requestTimeoutMillis = 60000
+                    connectTimeoutMillis = 30000
+                    socketTimeoutMillis = 60000
+                }
+
             }
         }
 
