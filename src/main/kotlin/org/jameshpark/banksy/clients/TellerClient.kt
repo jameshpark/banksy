@@ -18,6 +18,7 @@ import io.ktor.http.path
 import io.ktor.serialization.jackson.jackson
 import java.time.LocalDate
 import java.util.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import nl.altindag.ssl.SSLFactory
@@ -55,7 +56,9 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
     ): Flow<TellerTransaction> = flow {
         var fromId = pageStartId
         do {
-            val page = nextPage(accessToken, accountId, pageSize, fromId)
+            val page = withBackoff {
+                nextPage(accessToken, accountId, pageSize, fromId)
+            }
             val posted = page.filter { it.status == Status.POSTED }
             val filtered = posted.filter { it.date > bookmark }
 
@@ -63,6 +66,23 @@ class TellerClient(private val httpClient: HttpClient) : AutoCloseable {
 
             filtered.forEach { emit(it) }
         } while (posted.all { it.date > bookmark })
+    }
+
+    private suspend fun <T> withBackoff(attempts: Int = 5, block: suspend () -> T): T {
+        var delayMillis = 1L
+        for (attempt in 1..attempts) {
+            try {
+                return block()
+            } catch (e: Exception) {
+                logger.error(e) { "Error making request to teller. Attempt $attempt of $attempts" }
+                if (attempt == attempts) {
+                    throw e
+                }
+            }
+            delayMillis *= 2_000L
+            delay(delayMillis)
+        }
+        throw IllegalStateException("Should not be able to reach this point")
     }
 
     private suspend fun nextPage(
